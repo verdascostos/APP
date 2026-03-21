@@ -1770,14 +1770,14 @@ const CATEGORY_COLORS = [
 const styles = {
 
   authPage: {
-    minHeight: "100vh",
+    minHeight: "100dvh",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
     padding: 24,
     boxSizing: "border-box",
     position: "relative",
-    overflow: "hidden",
+    overflowX: "hidden",
   },
   authShell: {
     minHeight: "calc(100vh - 48px)",
@@ -1970,7 +1970,7 @@ const styles = {
     boxSizing: "border-box",
     position: "relative",
     overflowX: "hidden",
-  }
+  },
   glowTop: {
     position: "absolute",
     width: 420,
