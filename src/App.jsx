@@ -451,7 +451,7 @@ export default function App() {
   }, [data]);
 
   const visibleCategoryRows = useMemo(() => {
-    const rows = selectedCategoryFilter === "todas"
+    const rows = selectedCategoryFilter === "Todas"
       ? categoryExpenseTotals
       : categoryExpenseTotals.filter((row) => row.category === selectedCategoryFilter);
 
@@ -473,7 +473,7 @@ export default function App() {
   const topCategoryRows = useMemo(() => visibleCategoryRows.slice(0, 6), [visibleCategoryRows]);
 
   const selectedCategoryLabel =
-    selectedCategoryFilter === "todas" ? "todas las categorías" : selectedCategoryFilter;
+    selectedCategoryFilter === "Todas" ? "Todas las categorías" : selectedCategoryFilter;
 
   const selectedMonthName = activeTab === "Dashboard" ? currentMonth : activeTab;
   const selectedMonth = data[selectedMonthName] || emptyMonth();
@@ -494,12 +494,12 @@ export default function App() {
   };
 
   const filteredIngresos = useMemo(() => {
-    if (selectedCategoryFilter === "todas") return selectedMonth.ingresos;
+    if (selectedCategoryFilter === "Todas") return selectedMonth.ingresos;
     return selectedMonth.ingresos.filter((entry) => (entry.categoria || "otro") === selectedCategoryFilter);
   }, [selectedMonth.ingresos, selectedCategoryFilter]);
 
   const filteredGastos = useMemo(() => {
-    if (selectedCategoryFilter === "todas") return selectedMonth.gastos;
+    if (selectedCategoryFilter === "Todas") return selectedMonth.gastos;
     return selectedMonth.gastos.filter((entry) => (entry.categoria || "otro") === selectedCategoryFilter);
   }, [selectedMonth.gastos, selectedCategoryFilter]);
 
@@ -643,7 +643,7 @@ export default function App() {
                   value={selectedCategoryFilter}
                   onChange={(e) => setSelectedCategoryFilter(e.target.value)}
                 >
-                  <option value="todas">todas</option>
+                  <option value="Todas">Todas</option>
                   {CATEGORIES.map((category) => (
                     <option key={category} value={category}>
                       {category}
@@ -965,7 +965,7 @@ function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
 
       {entries.length === 0 ? (
         <div style={styles.emptyBox}>
-          {categoryFilter === "todas"
+          {categoryFilter === "Todas"
             ? "Todavía no cargaste nada."
             : `No hay movimientos visibles para ${categoryFilter}.`}
         </div>
