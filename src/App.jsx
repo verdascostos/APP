@@ -123,9 +123,22 @@ export default function App() {
       rootWidth: root?.style.width || "",
       rootMargin: root?.style.margin || "",
       rootPadding: root?.style.padding || "",
+      rootDisplay: root?.style.display || "",
+      rootMinHeight: root?.style.minHeight || "",
+      rootHeight: root?.style.height || "",
+      rootOverflow: root?.style.overflow || "",
+      rootOverflowY: root?.style.overflowY || "",
       htmlOverflowX: html.style.overflowX || "",
+      htmlOverflowY: html.style.overflowY || "",
+      htmlWidth: html.style.width || "",
+      htmlHeight: html.style.height || "",
       bodyOverflowX: body.style.overflowX || "",
+      bodyOverflowY: body.style.overflowY || "",
       bodyMargin: body.style.margin || "",
+      bodyWidth: body.style.width || "",
+      bodyMinHeight: body.style.minHeight || "",
+      bodyHeight: body.style.height || "",
+      bodyDisplay: body.style.display || "",
     };
 
     if (root) {
@@ -133,11 +146,25 @@ export default function App() {
       root.style.width = "100%";
       root.style.margin = "0";
       root.style.padding = "0";
+      root.style.display = "block";
+      root.style.minHeight = "100vh";
+      root.style.height = "auto";
+      root.style.overflow = "visible";
+      root.style.overflowY = "visible";
     }
 
+    html.style.width = "100%";
+    html.style.height = "auto";
     html.style.overflowX = "hidden";
-    body.style.overflowX = "hidden";
+    html.style.overflowY = "auto";
+
+    body.style.width = "100%";
+    body.style.minHeight = "100vh";
+    body.style.height = "auto";
+    body.style.display = "block";
     body.style.margin = "0";
+    body.style.overflowX = "hidden";
+    body.style.overflowY = "visible";
 
     return () => {
       if (root) {
@@ -145,10 +172,23 @@ export default function App() {
         root.style.width = previous.rootWidth;
         root.style.margin = previous.rootMargin;
         root.style.padding = previous.rootPadding;
+        root.style.display = previous.rootDisplay;
+        root.style.minHeight = previous.rootMinHeight;
+        root.style.height = previous.rootHeight;
+        root.style.overflow = previous.rootOverflow;
+        root.style.overflowY = previous.rootOverflowY;
       }
       html.style.overflowX = previous.htmlOverflowX;
+      html.style.overflowY = previous.htmlOverflowY;
+      html.style.width = previous.htmlWidth;
+      html.style.height = previous.htmlHeight;
       body.style.overflowX = previous.bodyOverflowX;
+      body.style.overflowY = previous.bodyOverflowY;
       body.style.margin = previous.bodyMargin;
+      body.style.width = previous.bodyWidth;
+      body.style.minHeight = previous.bodyMinHeight;
+      body.style.height = previous.bodyHeight;
+      body.style.display = previous.bodyDisplay;
     };
   }, []);
 
@@ -389,56 +429,72 @@ export default function App() {
 
   const headerRightStyle = {
     ...styles.headerRight,
-    display: "grid",
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(300px, 380px) minmax(0, 1fr)",
-    alignItems: "center",
+    display: isTablet ? "grid" : "flex",
+    alignItems: isTablet ? "stretch" : "center",
+    justifyContent: "space-between",
     width: "100%",
-    gap: isPhone ? 12 : 24,
+    gap: isPhone ? 14 : isTablet ? 18 : 26,
     minWidth: 0,
   };
 
   const userCardStyle = {
     ...styles.userCard,
-    width: "100%",
-    maxWidth: isTablet ? "100%" : 380,
-    flexShrink: 0,
+    width: isTablet ? "100%" : "min(100%, 420px)",
+    maxWidth: isTablet ? "100%" : 420,
+    flex: isTablet ? "0 1 auto" : "0 1 420px",
     justifySelf: "start",
   };
 
   const headerControlsGroupStyle = {
     display: "grid",
-    gridTemplateColumns: isPhone ? "1fr" : "minmax(190px, 210px) auto",
+    gridTemplateColumns: isTinyPhone
+      ? "1fr"
+      : isPhone
+      ? "minmax(180px, 210px) auto"
+      : "minmax(190px, 210px) auto auto",
+    gridTemplateAreas: isTinyPhone
+      ? `"year" "status" "logout"`
+      : isPhone
+      ? `"year status" "logout logout"`
+      : `"year status logout"`,
     alignItems: "center",
-    justifyContent: isTablet ? "stretch" : "end",
+    justifyContent: isTablet ? "start" : "end",
     justifySelf: isTablet ? "stretch" : "end",
-    gap: isPhone ? 12 : 18,
-    width: "100%",
+    columnGap: isTinyPhone ? 0 : 16,
+    rowGap: 12,
+    width: isTablet ? "100%" : "auto",
     minWidth: 0,
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
+    gridArea: "year",
     width: "100%",
     minWidth: 0,
-    maxWidth: isPhone ? "100%" : 210,
+    maxWidth: isTinyPhone ? "100%" : 210,
     minHeight: isPhone ? 76 : 78,
     padding: isPhone ? 12 : "12px 14px",
+  };
+
+  const statusInlineHeaderStyle = {
+    ...styles.statusInline,
+    gridArea: "status",
+    minWidth: 0,
+    alignItems: "flex-start",
+    justifySelf: "start",
+  };
+
+  const logoutButtonHeaderStyle = {
+    ...styles.logoutButton,
+    gridArea: "logout",
+    justifySelf: isTinyPhone ? "stretch" : "start",
+    width: isTinyPhone ? "100%" : "auto",
   };
 
   const heroBottomStackStyle = {
     display: "grid",
     gap: isPhone ? 10 : 12,
     marginTop: 14,
-  };
-
-  const topBarActionsStyle = {
-    ...styles.topBarActions,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    minHeight: "auto",
-    gap: isPhone ? 10 : 16,
-    flexWrap: isTablet ? "wrap" : "nowrap",
-    minWidth: 0,
   };
 
   const titleStyle = {
@@ -837,19 +893,17 @@ export default function App() {
                 </select>
               </div>
 
-              <div style={topBarActionsStyle}>
-                <div style={styles.statusInline}>
-                  <div style={styles.statusInlineLabel}>Estado</div>
-                  <div style={styles.statusPill}>
-                    <span style={styles.statusDot} />
-                    {cloudStatus}
-                  </div>
+              <div style={statusInlineHeaderStyle}>
+                <div style={styles.statusInlineLabel}>Estado</div>
+                <div style={styles.statusPill}>
+                  <span style={styles.statusDot} />
+                  {cloudStatus}
                 </div>
-
-                <button style={styles.logoutButton} onClick={handleLogout}>
-                  Cerrar sesión
-                </button>
               </div>
+
+              <button style={logoutButtonHeaderStyle} onClick={handleLogout}>
+                Cerrar sesión
+              </button>
             </div>
           </div>
         </div>
@@ -1944,13 +1998,14 @@ const styles = {
   page: {
     minHeight: "100vh",
     width: "100%",
+    maxWidth: "100%",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
     padding: "clamp(10px, 1vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
-    overflowX: "clip",
+    overflowX: "hidden",
     overflowY: "visible",
   },
   glowTop: {
@@ -1977,10 +2032,11 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: "none",
+    maxWidth: "100%",
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
+    overflow: "visible",
   },
   header: {
     display: "grid",
@@ -1992,7 +2048,7 @@ const styles = {
   headerRight: {
     display: "grid",
     gap: 14,
-    justifyContent: "start",
+    justifyContent: "space-between",
     width: "100%",
     minWidth: 0,
   },
@@ -2041,7 +2097,7 @@ const styles = {
     flexDirection: "column",
     justifyContent: "center",
     gap: 8,
-    minWidth: 128,
+    minWidth: 0,
     flexShrink: 0,
   },
   statusInlineLabel: {
@@ -2425,7 +2481,7 @@ const styles = {
   },
   quickEntryBox: {
     display: "grid",
-    gridTemplateColumns: "minmax(220px, 2fr) minmax(140px, 1fr) 110px minmax(180px, 1.2fr)",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
     gap: 10,
     marginBottom: 10,
   },
