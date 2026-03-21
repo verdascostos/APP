@@ -356,9 +356,22 @@ export default function App() {
       : isPhone
       ? "1fr"
       : isTablet
-      ? "minmax(0, 1fr) minmax(220px, 0.62fr)"
-      : "minmax(360px, 1.35fr) minmax(220px, 0.58fr) auto",
+      ? "minmax(0, 1fr) minmax(190px, 240px)"
+      : "minmax(360px, 1fr) minmax(190px, 230px) auto",
     alignItems: "stretch",
+  };
+
+  const yearBoxStyle = {
+    ...styles.yearBox,
+    width: "100%",
+    maxWidth: isPhone ? "100%" : isTablet ? 240 : 230,
+    justifySelf: "start",
+  };
+
+  const heroBottomStackStyle = {
+    display: "grid",
+    gap: isPhone ? 10 : 12,
+    marginTop: 14,
   };
 
   const topBarActionsStyle = {
@@ -747,7 +760,7 @@ export default function App() {
               <div style={styles.userEmail}>{currentUser.email}</div>
             </div>
 
-            <div style={styles.yearBox}>
+            <div style={yearBoxStyle}>
               <label style={styles.label}>Año</label>
               <select
                 style={styles.input}
@@ -817,33 +830,35 @@ export default function App() {
                   <div style={styles.heroBadge}>USD: US$ {formatUSD(finalUSD)}</div>
                 </div>
 
-                <div style={styles.progressBlock}>
-                  <div style={styles.progressHeader}>
-                    <span style={styles.progressLabel}>Tasa de ahorro anual ARS</span>
-                    <strong style={styles.progressValue}>{formatPercent(annualSavingsRate)}</strong>
+                <div style={heroBottomStackStyle}>
+                  <div style={styles.progressBlock}>
+                    <div style={styles.progressHeader}>
+                      <span style={styles.progressLabel}>Tasa de ahorro anual ARS</span>
+                      <strong style={styles.progressValue}>{formatPercent(annualSavingsRate)}</strong>
+                    </div>
+                    <ProgressBar value={annualSavingsRate} max={100} color="#4ef0a8" />
                   </div>
-                  <ProgressBar value={annualSavingsRate} max={100} color="#4ef0a8" />
-                </div>
 
-                <div style={summaryCardsGrid}>
-                  <MiniPanel
-                    title="Mes actual"
-                    mainValue={`$ ${formatARS(currentMonthSummary.balanceARS)}`}
-                    secondary={`${currentMonth}`}
-                    tone={currentMonthSummary.balanceARS >= 0 ? "green" : "red"}
-                  />
-                  <MiniPanel
-                    title="Mejor mes ARS"
-                    mainValue={`$ ${formatARS(bestARSMonth.value)}`}
-                    secondary={bestARSMonth.month}
-                    tone="green"
-                  />
-                  <MiniPanel
-                    title="Peor mes ARS"
-                    mainValue={`$ ${formatARS(worstARSMonth.value)}`}
-                    secondary={worstARSMonth.month}
-                    tone="red"
-                  />
+                  <div style={summaryCardsGrid}>
+                    <MiniPanel
+                      title="Mes actual"
+                      mainValue={`$ ${formatARS(currentMonthSummary.balanceARS)}`}
+                      secondary={`${currentMonth}`}
+                      tone={currentMonthSummary.balanceARS >= 0 ? "green" : "red"}
+                    />
+                    <MiniPanel
+                      title="Mejor mes ARS"
+                      mainValue={`$ ${formatARS(bestARSMonth.value)}`}
+                      secondary={bestARSMonth.month}
+                      tone="green"
+                    />
+                    <MiniPanel
+                      title="Peor mes ARS"
+                      mainValue={`$ ${formatARS(worstARSMonth.value)}`}
+                      secondary={worstARSMonth.month}
+                      tone="red"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1947,13 +1962,13 @@ const styles = {
     fontSize: 18,
   },
   yearBox: {
-    minWidth: 160,
+    minWidth: 0,
     minHeight: 86,
     width: "100%",
     background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
     border: "1px solid rgba(72, 100, 145, 0.18)",
     borderRadius: 22,
-    padding: 16,
+    padding: 14,
     boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
     backdropFilter: "blur(10px)",
   },
@@ -2014,9 +2029,9 @@ const styles = {
   },
   summaryCardsGrid: {
     display: "grid",
-    gap: 12,
-    marginTop: 18,
-    marginBottom: 18,
+    gap: 10,
+    marginTop: 0,
+    marginBottom: 0,
   },
   monthMetaGrid: {
     display: "grid",
@@ -2075,7 +2090,7 @@ const styles = {
     backdropFilter: "blur(12px)",
   },
   heroCard: {
-    padding: 24,
+    padding: 22,
     background: "linear-gradient(145deg, rgba(18, 34, 58, 0.90) 0%, rgba(10, 21, 39, 0.92) 100%)",
   },
   monthSnapshotCard: {
@@ -2107,9 +2122,9 @@ const styles = {
     fontWeight: 700,
   },
   progressBlock: {
-    marginTop: 18,
-    padding: 14,
-    borderRadius: 18,
+    marginTop: 0,
+    padding: 12,
+    borderRadius: 16,
     background: "rgba(9, 18, 30, 0.60)",
     border: "1px solid rgba(73, 102, 143, 0.32)",
   },
@@ -2129,7 +2144,7 @@ const styles = {
   },
   progressTrack: {
     width: "100%",
-    height: 10,
+    height: 8,
     borderRadius: 999,
     background: "rgba(255,255,255,0.08)",
     overflow: "hidden",
@@ -2198,21 +2213,21 @@ const styles = {
     flexWrap: "wrap",
   },
   miniPanel: {
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: 16,
+    padding: "12px 14px",
   },
   miniPanelTitle: {
-    fontSize: 13,
-    marginBottom: 8,
+    fontSize: 12,
+    marginBottom: 6,
     opacity: 0.9,
   },
   miniPanelValue: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 800,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   miniPanelSecondary: {
-    fontSize: 13,
+    fontSize: 12,
     opacity: 0.8,
   },
   infoCard: {
