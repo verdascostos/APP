@@ -114,81 +114,57 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const root = document.getElementById("root");
-    const html = document.documentElement;
-    const body = document.body;
+    const styleId = "budget-layout-reset";
+    let styleTag = document.getElementById(styleId);
+    const createdNow = !styleTag;
+    const previousContent = styleTag?.textContent || "";
 
-    const previous = {
-      rootMaxWidth: root?.style.maxWidth || "",
-      rootWidth: root?.style.width || "",
-      rootMargin: root?.style.margin || "",
-      rootPadding: root?.style.padding || "",
-      rootDisplay: root?.style.display || "",
-      rootMinHeight: root?.style.minHeight || "",
-      rootHeight: root?.style.height || "",
-      rootOverflow: root?.style.overflow || "",
-      rootOverflowY: root?.style.overflowY || "",
-      htmlOverflowX: html.style.overflowX || "",
-      htmlOverflowY: html.style.overflowY || "",
-      htmlWidth: html.style.width || "",
-      htmlHeight: html.style.height || "",
-      bodyOverflowX: body.style.overflowX || "",
-      bodyOverflowY: body.style.overflowY || "",
-      bodyMargin: body.style.margin || "",
-      bodyWidth: body.style.width || "",
-      bodyMinHeight: body.style.minHeight || "",
-      bodyHeight: body.style.height || "",
-      bodyDisplay: body.style.display || "",
-    };
-
-    if (root) {
-      root.style.maxWidth = "none";
-      root.style.width = "100%";
-      root.style.margin = "0";
-      root.style.padding = "0";
-      root.style.display = "block";
-      root.style.minHeight = "100vh";
-      root.style.height = "auto";
-      root.style.overflow = "visible";
-      root.style.overflowY = "visible";
+    if (!styleTag) {
+      styleTag = document.createElement("style");
+      styleTag.id = styleId;
+      document.head.appendChild(styleTag);
     }
 
-    html.style.width = "100%";
-    html.style.height = "auto";
-    html.style.overflowX = "hidden";
-    html.style.overflowY = "auto";
+    styleTag.textContent = `
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
 
-    body.style.width = "100%";
-    body.style.minHeight = "100vh";
-    body.style.height = "auto";
-    body.style.display = "block";
-    body.style.margin = "0";
-    body.style.overflowX = "hidden";
-    body.style.overflowY = "visible";
+      html, body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      body {
+        display: block;
+        overflow-y: auto;
+      }
+
+      #root {
+        width: 100%;
+        max-width: none !important;
+        min-width: 0;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        display: block;
+        overflow: visible;
+        text-align: left;
+      }
+    `;
 
     return () => {
-      if (root) {
-        root.style.maxWidth = previous.rootMaxWidth;
-        root.style.width = previous.rootWidth;
-        root.style.margin = previous.rootMargin;
-        root.style.padding = previous.rootPadding;
-        root.style.display = previous.rootDisplay;
-        root.style.minHeight = previous.rootMinHeight;
-        root.style.height = previous.rootHeight;
-        root.style.overflow = previous.rootOverflow;
-        root.style.overflowY = previous.rootOverflowY;
+      if (!styleTag) return;
+      if (createdNow) {
+        styleTag.remove();
+      } else {
+        styleTag.textContent = previousContent;
       }
-      html.style.overflowX = previous.htmlOverflowX;
-      html.style.overflowY = previous.htmlOverflowY;
-      html.style.width = previous.htmlWidth;
-      html.style.height = previous.htmlHeight;
-      body.style.overflowX = previous.bodyOverflowX;
-      body.style.overflowY = previous.bodyOverflowY;
-      body.style.margin = previous.bodyMargin;
-      body.style.width = previous.bodyWidth;
-      body.style.minHeight = previous.bodyMinHeight;
-      body.style.height = previous.bodyHeight;
-      body.style.display = previous.bodyDisplay;
     };
   }, []);
 
@@ -429,65 +405,53 @@ export default function App() {
 
   const headerRightStyle = {
     ...styles.headerRight,
-    display: isTablet ? "grid" : "flex",
-    alignItems: isTablet ? "stretch" : "center",
-    justifyContent: "space-between",
+    display: "grid",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(280px, 420px) minmax(0, 1fr)",
+    alignItems: "center",
     width: "100%",
-    gap: isPhone ? 14 : isTablet ? 18 : 26,
+    gap: isPhone ? 14 : 18,
     minWidth: 0,
   };
 
   const userCardStyle = {
     ...styles.userCard,
-    width: isTablet ? "100%" : "min(100%, 420px)",
+    width: "100%",
     maxWidth: isTablet ? "100%" : 420,
-    flex: isTablet ? "0 1 auto" : "0 1 420px",
     justifySelf: "start",
   };
 
   const headerControlsGroupStyle = {
-    display: "grid",
-    gridTemplateColumns: isTinyPhone
-      ? "1fr"
-      : isPhone
-      ? "minmax(180px, 210px) auto"
-      : "minmax(190px, 210px) auto auto",
-    gridTemplateAreas: isTinyPhone
-      ? `"year" "status" "logout"`
-      : isPhone
-      ? `"year status" "logout logout"`
-      : `"year status logout"`,
-    alignItems: "center",
-    justifyContent: isTablet ? "start" : "end",
-    justifySelf: isTablet ? "stretch" : "end",
-    columnGap: isTinyPhone ? 0 : 16,
-    rowGap: 12,
-    width: isTablet ? "100%" : "auto",
+    display: "flex",
+    flexWrap: isPhone ? "wrap" : "nowrap",
+    alignItems: isTinyPhone ? "stretch" : "flex-end",
+    justifyContent: isTablet ? "flex-start" : "flex-end",
+    gap: isTinyPhone ? 12 : 16,
+    width: "100%",
     minWidth: 0,
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
-    gridArea: "year",
-    width: "100%",
-    minWidth: 0,
-    maxWidth: isTinyPhone ? "100%" : 210,
+    width: isTinyPhone ? "100%" : 216,
+    maxWidth: "100%",
+    minWidth: isTinyPhone ? 0 : 198,
     minHeight: isPhone ? 76 : 78,
     padding: isPhone ? 12 : "12px 14px",
+    flex: isTinyPhone ? "1 1 100%" : "0 0 216px",
   };
 
   const statusInlineHeaderStyle = {
     ...styles.statusInline,
-    gridArea: "status",
     minWidth: 0,
+    flex: "0 0 auto",
     alignItems: "flex-start",
-    justifySelf: "start",
+    alignSelf: isTinyPhone ? "stretch" : "flex-end",
   };
 
   const logoutButtonHeaderStyle = {
     ...styles.logoutButton,
-    gridArea: "logout",
-    justifySelf: isTinyPhone ? "stretch" : "start",
+    flex: "0 0 auto",
+    alignSelf: isTinyPhone ? "stretch" : "flex-end",
     width: isTinyPhone ? "100%" : "auto",
   };
 
@@ -516,6 +480,7 @@ export default function App() {
     overflowX: isPhone ? "auto" : "visible",
     paddingBottom: isPhone ? 4 : 0,
     marginBottom: 24,
+    rowGap: 10,
     scrollbarWidth: "none",
     msOverflowStyle: "none",
   };
@@ -1951,8 +1916,8 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 82,
-    padding: "16px 18px",
+    minHeight: 78,
+    padding: "15px 18px",
     borderRadius: 22,
     background: "linear-gradient(180deg, rgba(18, 32, 52, 0.88) 0%, rgba(11, 22, 38, 0.92) 100%)",
     border: "1px solid rgba(90, 120, 170, 0.20)",
@@ -2002,7 +1967,7 @@ const styles = {
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: "clamp(10px, 1vw, 18px)",
+    padding: "clamp(12px, 1.2vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
     overflowX: "hidden",
@@ -2037,6 +2002,7 @@ const styles = {
     position: "relative",
     zIndex: 1,
     overflow: "visible",
+    minWidth: 0,
   },
   header: {
     display: "grid",
@@ -2047,8 +2013,7 @@ const styles = {
   },
   headerRight: {
     display: "grid",
-    gap: 14,
-    justifyContent: "space-between",
+    gap: 16,
     width: "100%",
     minWidth: 0,
   },
@@ -2083,13 +2048,13 @@ const styles = {
   },
   yearBox: {
     minWidth: 0,
-    minHeight: 82,
+    minHeight: 78,
     width: "100%",
     background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
     border: "1px solid rgba(72, 100, 145, 0.18)",
     borderRadius: 22,
-    padding: 14,
-    boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
+    padding: 12,
+    boxShadow: "0 16px 28px rgba(4, 8, 18, 0.12)",
     backdropFilter: "blur(10px)",
   },
   statusInline: {
@@ -2143,11 +2108,13 @@ const styles = {
     gap: 18,
     marginBottom: 18,
     alignItems: "start",
+    minWidth: 0,
   },
   chartsGrid: {
     display: "grid",
     gap: 18,
     marginBottom: 18,
+    minWidth: 0,
   },
   summaryCardsGrid: {
     display: "grid",
@@ -2175,6 +2142,7 @@ const styles = {
     marginBottom: 28,
     width: "100%",
     alignItems: "center",
+    minWidth: 0,
   },
   tab: {
     background: "rgba(13, 23, 39, 0.62)",
@@ -2201,6 +2169,7 @@ const styles = {
   monthGrid: {
     display: "grid",
     gap: 18,
+    minWidth: 0,
   },
   card: {
     background: "linear-gradient(180deg, rgba(12, 22, 38, 0.80) 0%, rgba(8, 17, 29, 0.84) 100%)",
@@ -2231,9 +2200,10 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 64,
+    fontSize: 60,
     fontWeight: 800,
     letterSpacing: -1.2,
+    lineHeight: 0.95,
   },
   heroBadge: {
     padding: "10px 14px",
@@ -2484,6 +2454,7 @@ const styles = {
     gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
     gap: 10,
     marginBottom: 10,
+    minWidth: 0,
   },
   quickInputText: {
     minWidth: 0,
@@ -2660,6 +2631,8 @@ const styles = {
   },
   tableWrap: {
     overflowX: "auto",
+    width: "100%",
+    maxWidth: "100%",
   },
   table: {
     width: "100%",
