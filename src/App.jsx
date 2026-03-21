@@ -350,32 +350,39 @@ export default function App() {
 
   const headerRightStyle = {
     ...styles.headerRight,
-    width: isTablet ? "100%" : "fit-content",
-    maxWidth: "100%",
-    justifySelf: "start",
-    justifyContent: "start",
-    gap: isPhone ? 12 : 14,
-    gridTemplateColumns: isTinyPhone
-      ? "1fr"
-      : isPhone
-      ? "1fr"
-      : isTablet
-      ? "minmax(0, 1fr) minmax(180px, 220px)"
-      : "minmax(280px, 340px) 210px auto",
-    alignItems: "stretch",
+    display: "flex",
+    flexDirection: isTablet ? "column" : "row",
+    alignItems: isTablet ? "stretch" : "center",
+    justifyContent: "space-between",
+    width: "100%",
+    gap: isPhone ? 12 : 18,
   };
 
   const userCardStyle = {
     ...styles.userCard,
     width: "100%",
-    maxWidth: isPhone ? "100%" : isTablet ? "100%" : 340,
+    maxWidth: isTablet ? "100%" : 360,
+    flexShrink: 0,
+  };
+
+  const headerControlsGroupStyle = {
+    display: "grid",
+    gridTemplateColumns: isPhone ? "1fr" : "210px auto",
+    alignItems: "center",
+    justifyContent: isTablet ? "stretch" : "end",
+    gap: isPhone ? 12 : 14,
+    width: isTablet ? "100%" : "auto",
+    marginLeft: isTablet ? 0 : 24,
+    flexShrink: 0,
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
     width: "100%",
-    maxWidth: isPhone ? "100%" : isTablet ? 220 : 210,
-    justifySelf: "start",
+    minWidth: 0,
+    maxWidth: isPhone ? "100%" : 210,
+    minHeight: isPhone ? 76 : 78,
+    padding: isPhone ? 12 : "12px 14px",
   };
 
   const heroBottomStackStyle = {
@@ -386,9 +393,11 @@ export default function App() {
 
   const topBarActionsStyle = {
     ...styles.topBarActions,
-    gridColumn: isPhone ? "auto" : isTablet ? "1 / -1" : "auto",
-    justifySelf: isTablet ? "stretch" : "end",
-    minHeight: isPhone ? "auto" : 86,
+    justifyContent: isPhone ? "flex-start" : "flex-end",
+    alignItems: "center",
+    minHeight: "auto",
+    gap: 12,
+    flexWrap: isTablet ? "wrap" : "nowrap",
   };
 
   const titleStyle = {
@@ -771,33 +780,35 @@ export default function App() {
               <div style={styles.userEmail}>{currentUser.email}</div>
             </div>
 
-            <div style={yearBoxStyle}>
-              <label style={styles.label}>Año</label>
-              <select
-                style={styles.input}
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-              >
-                {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
-                  <option key={optionYear} value={optionYear}>
-                    {optionYear}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div style={topBarActionsStyle}>
-              <div style={styles.statusInline}>
-                <div style={styles.statusInlineLabel}>Estado</div>
-                <div style={styles.statusPill}>
-                  <span style={styles.statusDot} />
-                  {cloudStatus}
-                </div>
+            <div style={headerControlsGroupStyle}>
+              <div style={yearBoxStyle}>
+                <label style={styles.label}>Año</label>
+                <select
+                  style={styles.input}
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                >
+                  {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
+                    <option key={optionYear} value={optionYear}>
+                      {optionYear}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <button style={styles.logoutButton} onClick={handleLogout}>
-                Cerrar sesión
-              </button>
+              <div style={topBarActionsStyle}>
+                <div style={styles.statusInline}>
+                  <div style={styles.statusInlineLabel}>Estado</div>
+                  <div style={styles.statusPill}>
+                    <span style={styles.statusDot} />
+                    {cloudStatus}
+                  </div>
+                </div>
+
+                <button style={styles.logoutButton} onClick={handleLogout}>
+                  Cerrar sesión
+                </button>
+              </div>
             </div>
           </div>
         </div>
