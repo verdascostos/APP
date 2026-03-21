@@ -22,6 +22,7 @@ const CATEGORIES = [
   "Apuestas",
   "Casa",
   "Comida",
+  "Conversión ARS<->USD",
   "Farmacia",
   "Honorarios",
   "Inversiones",
@@ -385,13 +386,13 @@ export default function App() {
     );
   }, [monthSummary]);
 
-  const worstARSMonth = useMemo(() => {
+  const bestUSDMonth = useMemo(() => {
     return MONTHS.reduce(
-      (worst, month) =>
-        monthSummary[month]?.balanceARS < worst.value
-          ? { month, value: monthSummary[month]?.balanceARS || 0 }
-          : worst,
-      { month: MONTHS[0], value: monthSummary[MONTHS[0]]?.balanceARS || 0 }
+      (best, month) =>
+        monthSummary[month]?.ahorroFinalUSD > best.value
+          ? { month, value: monthSummary[month]?.ahorroFinalUSD || 0 }
+          : best,
+      { month: MONTHS[0], value: monthSummary[MONTHS[0]]?.ahorroFinalUSD || 0 }
     );
   }, [monthSummary]);
 
@@ -433,9 +434,11 @@ export default function App() {
       });
     });
 
-    return Object.values(base).sort((a, b) =>
-      a.category.localeCompare(b.category, "es", { sensitivity: "base" })
-    );
+    return Object.values(base).sort((a, b) => {
+      if (b.ars !== a.ars) return b.ars - a.ars;
+      if (b.usd !== a.usd) return b.usd - a.usd;
+      return b.count - a.count;
+    });
   }, [data]);
 
   const visibleCategoryRows = useMemo(() => {
@@ -458,7 +461,7 @@ export default function App() {
     );
   }, [visibleCategoryRows]);
 
-  const topCategoryRows = useMemo(() => visibleCategoryRows, [visibleCategoryRows]);
+  const topCategoryRows = useMemo(() => visibleCategoryRows.slice(0, 6), [visibleCategoryRows]);
 
   const selectedCategoryLabel =
     selectedCategoryFilter === "todas" ? "todas las categorías" : selectedCategoryFilter;
@@ -582,13 +585,13 @@ export default function App() {
                     title="Mejor mes ARS"
                     mainValue={`$ ${formatARS(bestARSMonth.value)}`}
                     secondary={bestARSMonth.month}
-                    tone="green"
+                    tone="blue"
                   />
                   <MiniPanel
-                    title="Peor mes ARS"
-                    mainValue={`$ ${formatARS(worstARSMonth.value)}`}
-                    secondary={worstARSMonth.month}
-                    tone="red"
+                    title="Promedio mensual USD"
+                    mainValue={`US$ ${formatUSD(avgBalanceUSD)}`}
+                    secondary="Balance promedio"
+                    tone="gold"
                   />
                 </div>
               </div>
@@ -616,12 +619,6 @@ export default function App() {
               <StatCard title="Gastos ARS" value={`$ ${formatARS(totals.gastosARS)}`} accent="#ff7a8c" />
               <StatCard title="Balance anual ARS" value={`$ ${formatARS(totals.balanceARS)}`} accent="#88c8ff" />
               <StatCard title="Ahorro final USD" value={`US$ ${formatUSD(finalUSD)}`} accent="#f7d76d" />
-            </div>
-
-            <div style={summaryCardsGrid}>
-              <InfoCard title="Promedio mensual ARS" value={`$ ${formatARS(avgBalanceARS)}`} subtitle="Balance promedio del año" />
-              <InfoCard title="Promedio mensual USD" value={`US$ ${formatUSD(avgBalanceUSD)}`} subtitle="Balance promedio del año" />
-              <InfoCard title="Movimientos cargados" value={`${totals.movimientos}`} subtitle="Ingresos + gastos registrados" />
             </div>
 
             <div style={dashboardFilterGrid}>
