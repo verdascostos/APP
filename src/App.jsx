@@ -19,18 +19,19 @@ const MONTHS = [
 ];
 
 const CATEGORIES = [
-  "casa",
-  "comida",
-  "farmacia",
-  "mantenimiento",
-  "ocio",
-  "regalos",
-  "salidas/joda",
-  "supermercado",
-  "telefono",
-  "transporte",
-  "apuestas",
-  "inversiones",
+  "Casa",
+  "Comida",
+  "Farmacia",
+  "Mantenimiento",
+  "Ocio",
+  "Regalos",
+  "Salidas (Ej: Boliche)",
+  "Supermercado",
+  "Telefono",
+  "Transporte",
+  "Apuestas",
+  "Inversiones",
+  "Sueldo"
   "otro",
 ];
 
