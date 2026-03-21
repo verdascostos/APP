@@ -353,10 +353,10 @@ export default function App() {
     gridTemplateColumns: isTinyPhone
       ? "1fr"
       : isPhone
-      ? "repeat(2, minmax(0, 1fr))"
+      ? "1fr"
       : isTablet
       ? "repeat(2, minmax(0, 1fr))"
-      : "minmax(260px, 1.35fr) minmax(330px, 1.1fr) minmax(180px, 0.9fr)",
+      : "minmax(320px, 1.7fr) minmax(190px, 0.8fr) minmax(210px, 0.95fr) minmax(220px, 1fr)",
     alignItems: "stretch",
   };
 
@@ -364,12 +364,12 @@ export default function App() {
     ...styles.title,
     fontSize: isTinyPhone ? 34 : isPhone ? 40 : isTablet ? 46 : 58,
     textAlign: isTablet ? "left" : "left",
-    maxWidth: isTablet ? "100%" : 980,
+    maxWidth: isTablet ? "100%" : 1180,
   };
 
   const subtitleStyle = {
     ...styles.subtitle,
-    maxWidth: isTablet ? "100%" : 980,
+    maxWidth: isTablet ? "100%" : 1180,
     textAlign: "left",
   };
 
@@ -737,26 +737,24 @@ export default function App() {
               <div style={styles.userEmail}>{currentUser.email}</div>
             </div>
 
-            <div style={styles.headerControlStack}>
-              <div style={styles.yearBox}>
-                <label style={styles.label}>Año</label>
-                <select
-                  style={styles.input}
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                >
-                  {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
-                    <option key={optionYear} value={optionYear}>
-                      {optionYear}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div style={styles.yearBox}>
+              <label style={styles.label}>Año</label>
+              <select
+                style={styles.input}
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+              >
+                {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
+                  <option key={optionYear} value={optionYear}>
+                    {optionYear}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div style={styles.statusCard}>
-                <div style={styles.statusLabel}>Estado</div>
-                <div style={styles.statusPill}>{cloudStatus}</div>
-              </div>
+            <div style={styles.statusCard}>
+              <div style={styles.statusLabel}>Estado</div>
+              <div style={styles.statusPill}>{cloudStatus}</div>
             </div>
 
             <button style={styles.logoutButton} onClick={handleLogout}>
@@ -1851,10 +1849,13 @@ const styles = {
 
   page: {
     minHeight: "100vh",
+    width: "100vw",
+    marginLeft: "calc(50% - 50vw)",
+    marginRight: "calc(50% - 50vw)",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: "clamp(12px, 1.2vw, 22px)",
+    padding: "clamp(10px, 1vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
     overflow: "hidden",
@@ -1883,7 +1884,7 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: 1960,
+    maxWidth: 1720,
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
@@ -1917,7 +1918,7 @@ const styles = {
   },
   yearBox: {
     minWidth: 160,
-    minHeight: 96,
+    minHeight: 112,
     width: "100%",
     background: "rgba(10, 18, 34, 0.7)",
     border: "1px solid rgba(72, 100, 145, 0.35)",
@@ -1926,15 +1927,8 @@ const styles = {
     boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
     backdropFilter: "blur(10px)",
   },
-  headerControlStack: {
-    display: "grid",
-    gridTemplateColumns: "minmax(160px, 0.95fr) minmax(170px, 1fr)",
-    gap: 14,
-    alignItems: "stretch",
-    width: "100%",
-  },
   statusCard: {
-    minHeight: 96,
+    minHeight: 112,
     width: "100%",
     padding: 16,
     borderRadius: 18,
