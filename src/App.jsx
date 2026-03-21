@@ -356,22 +356,22 @@ export default function App() {
       : isPhone
       ? "1fr"
       : isTablet
-      ? "minmax(0, 1fr) minmax(190px, 240px)"
-      : "minmax(360px, 1fr) minmax(190px, 230px) auto",
+      ? "minmax(0, 1fr) minmax(170px, 220px)"
+      : "minmax(360px, 1fr) minmax(170px, 210px) auto",
     alignItems: "stretch",
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
     width: "100%",
-    maxWidth: isPhone ? "100%" : isTablet ? 240 : 230,
+    maxWidth: isPhone ? "100%" : isTablet ? 220 : 210,
     justifySelf: "start",
   };
 
   const heroBottomStackStyle = {
     display: "grid",
     gap: isPhone ? 10 : 12,
-    marginTop: 14,
+    marginTop: 12,
   };
 
   const topBarActionsStyle = {
@@ -407,6 +407,7 @@ export default function App() {
   const dashboardGrid = {
     ...styles.dashboardGrid,
     gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.65fr) minmax(360px, 0.95fr)",
+    alignItems: "start",
   };
   const monthGrid = {
     ...styles.monthGrid,
@@ -1963,12 +1964,12 @@ const styles = {
   },
   yearBox: {
     minWidth: 0,
-    minHeight: 86,
+    minHeight: 78,
     width: "100%",
     background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
     border: "1px solid rgba(72, 100, 145, 0.18)",
     borderRadius: 22,
-    padding: 14,
+    padding: 12,
     boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
     backdropFilter: "blur(10px)",
   },
@@ -2109,7 +2110,7 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 64,
+    fontSize: 56,
     fontWeight: 800,
     letterSpacing: -1.2,
   },
@@ -2214,7 +2215,7 @@ const styles = {
   },
   miniPanel: {
     borderRadius: 16,
-    padding: "12px 14px",
+    padding: "10px 14px",
   },
   miniPanelTitle: {
     fontSize: 12,
@@ -2222,7 +2223,7 @@ const styles = {
     opacity: 0.9,
   },
   miniPanelValue: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 800,
     marginBottom: 4,
   },
