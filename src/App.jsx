@@ -350,15 +350,25 @@ export default function App() {
 
   const headerRightStyle = {
     ...styles.headerRight,
-    width: "100%",
+    width: isTablet ? "100%" : "fit-content",
+    maxWidth: "100%",
+    justifySelf: "start",
+    justifyContent: "start",
+    gap: isPhone ? 12 : 14,
     gridTemplateColumns: isTinyPhone
       ? "1fr"
       : isPhone
       ? "1fr"
       : isTablet
-      ? "minmax(0, 1fr) minmax(170px, 220px)"
-      : "minmax(360px, 1fr) minmax(170px, 210px) auto",
+      ? "minmax(0, 1fr) minmax(180px, 220px)"
+      : "minmax(280px, 340px) 210px auto",
     alignItems: "stretch",
+  };
+
+  const userCardStyle = {
+    ...styles.userCard,
+    width: "100%",
+    maxWidth: isPhone ? "100%" : isTablet ? "100%" : 340,
   };
 
   const yearBoxStyle = {
@@ -371,7 +381,7 @@ export default function App() {
   const heroBottomStackStyle = {
     display: "grid",
     gap: isPhone ? 10 : 12,
-    marginTop: 12,
+    marginTop: 14,
   };
 
   const topBarActionsStyle = {
@@ -406,7 +416,7 @@ export default function App() {
 
   const dashboardGrid = {
     ...styles.dashboardGrid,
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.65fr) minmax(360px, 0.95fr)",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.78fr) minmax(340px, 0.82fr)",
     alignItems: "start",
   };
   const monthGrid = {
@@ -755,7 +765,7 @@ export default function App() {
           </div>
 
           <div style={headerRightStyle}>
-            <div style={styles.userCard}>
+            <div style={userCardStyle}>
               <div style={styles.userMetaLabel}>Sesión activa</div>
               <div style={styles.userName}>{currentUser.displayName || "Usuario"}</div>
               <div style={styles.userEmail}>{currentUser.email}</div>
@@ -1835,8 +1845,8 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 86,
-    padding: "18px 22px",
+    minHeight: 82,
+    padding: "16px 18px",
     borderRadius: 22,
     background: "linear-gradient(180deg, rgba(18, 32, 52, 0.88) 0%, rgba(11, 22, 38, 0.92) 100%)",
     border: "1px solid rgba(90, 120, 170, 0.20)",
@@ -1930,8 +1940,8 @@ const styles = {
   },
   headerRight: {
     display: "grid",
-    gap: 16,
-    justifyContent: "stretch",
+    gap: 14,
+    justifyContent: "start",
     width: "100%",
   },
   topBarActions: {
@@ -1964,12 +1974,12 @@ const styles = {
   },
   yearBox: {
     minWidth: 0,
-    minHeight: 78,
+    minHeight: 82,
     width: "100%",
     background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
     border: "1px solid rgba(72, 100, 145, 0.18)",
     borderRadius: 22,
-    padding: 12,
+    padding: 14,
     boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
     backdropFilter: "blur(10px)",
   },
@@ -2022,6 +2032,7 @@ const styles = {
     display: "grid",
     gap: 18,
     marginBottom: 18,
+    alignItems: "start",
   },
   chartsGrid: {
     display: "grid",
@@ -2110,7 +2121,7 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 56,
+    fontSize: 64,
     fontWeight: 800,
     letterSpacing: -1.2,
   },
@@ -2215,7 +2226,7 @@ const styles = {
   },
   miniPanel: {
     borderRadius: 16,
-    padding: "10px 14px",
+    padding: "12px 14px",
   },
   miniPanelTitle: {
     fontSize: 12,
@@ -2223,7 +2234,7 @@ const styles = {
     opacity: 0.9,
   },
   miniPanelValue: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 800,
     marginBottom: 4,
   },
