@@ -582,7 +582,7 @@ export default function App() {
                     title="Mejor mes ARS"
                     mainValue={`$ ${formatARS(bestARSMonth.value)}`}
                     secondary={bestARSMonth.month}
-                    tone="blue"
+                    tone="green"
                   />
                   <MiniPanel
                     title="Peor mes ARS"
