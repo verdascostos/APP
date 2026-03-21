@@ -356,20 +356,20 @@ export default function App() {
       ? "1fr"
       : isTablet
       ? "repeat(2, minmax(0, 1fr))"
-      : "minmax(320px, 1.7fr) minmax(190px, 0.8fr) minmax(210px, 0.95fr) minmax(220px, 1fr)",
+      : "minmax(320px, 1.65fr) minmax(170px, 0.72fr) minmax(185px, 0.82fr) minmax(210px, 0.92fr)",
     alignItems: "stretch",
   };
 
   const titleStyle = {
     ...styles.title,
-    fontSize: isTinyPhone ? 34 : isPhone ? 40 : isTablet ? 46 : 58,
-    textAlign: isTablet ? "left" : "left",
-    maxWidth: isTablet ? "100%" : 1180,
+    fontSize: isTinyPhone ? 34 : isPhone ? 42 : isTablet ? 50 : isLaptop ? 54 : 58,
+    textAlign: "left",
+    maxWidth: isTablet ? "100%" : 1040,
   };
 
   const subtitleStyle = {
     ...styles.subtitle,
-    maxWidth: isTablet ? "100%" : 1180,
+    maxWidth: isTablet ? "100%" : 900,
     textAlign: "left",
   };
 
@@ -377,8 +377,10 @@ export default function App() {
     ...styles.tabsWrap,
     flexWrap: "nowrap",
     overflowX: "auto",
-    paddingBottom: 8,
-    marginBottom: 28,
+    paddingBottom: 4,
+    marginBottom: 24,
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
   };
 
   const dashboardGrid = {
@@ -723,7 +725,7 @@ export default function App() {
 
       <div style={styles.container}>
         <div style={headerStyle}>
-          <div>
+          <div style={styles.titleBlock}>
             <h1 style={titleStyle}>Control de Gastos e Ingresos</h1>
             <p style={subtitleStyle}>
               Seguimiento anual con ahorro acumulado, balance mensual y evolución en dólares.
@@ -1804,15 +1806,16 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 96,
-    padding: "16px 18px",
-    borderRadius: 18,
-    background: "linear-gradient(180deg, rgba(112, 195, 255, 0.12) 0%, rgba(66, 120, 190, 0.12) 100%)",
-    border: "1px solid rgba(112, 195, 255, 0.22)",
+    minHeight: 92,
+    padding: "18px 20px",
+    borderRadius: 22,
+    background: "linear-gradient(180deg, rgba(86, 144, 214, 0.18) 0%, rgba(39, 81, 133, 0.18) 100%)",
+    border: "1px solid rgba(112, 195, 255, 0.20)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    gap: 4,
+    gap: 6,
+    boxShadow: "0 18px 36px rgba(3, 9, 20, 0.18)",
   },
   userMetaLabel: {
     fontSize: 11,
@@ -1834,17 +1837,17 @@ const styles = {
     marginTop: 3,
   },
   logoutButton: {
-    minHeight: 96,
+    minHeight: 92,
     width: "100%",
-    borderRadius: 18,
-    padding: "0 20px",
-    background: "linear-gradient(180deg, rgba(255, 122, 140, 0.16) 0%, rgba(134, 50, 66, 0.16) 100%)",
-    border: "1px solid rgba(255, 122, 140, 0.22)",
-    color: "#ffb0bb",
+    borderRadius: 22,
+    padding: "0 22px",
+    background: "linear-gradient(180deg, rgba(255, 122, 140, 0.14) 0%, rgba(124, 46, 61, 0.14) 100%)",
+    border: "1px solid rgba(255, 122, 140, 0.18)",
+    color: "#ffb7c2",
     fontWeight: 800,
     cursor: "pointer",
     fontSize: 18,
-    boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
+    boxShadow: "0 18px 36px rgba(4, 8, 18, 0.18)",
   },
 
   page: {
@@ -1884,7 +1887,7 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: 1720,
+    maxWidth: 1760,
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
@@ -1893,8 +1896,8 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "1fr",
     alignItems: "stretch",
-    gap: 18,
-    marginBottom: 24,
+    gap: 16,
+    marginBottom: 20,
   },
   headerRight: {
     display: "grid",
@@ -1902,39 +1905,46 @@ const styles = {
     justifyContent: "stretch",
     width: "100%",
   },
+  titleBlock: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+    marginBottom: 4,
+  },
   title: {
     margin: 0,
     fontSize: 52,
-    lineHeight: 1.03,
-    letterSpacing: "-0.03em",
+    lineHeight: 1.02,
+    letterSpacing: "-0.035em",
     maxWidth: 980,
+    textWrap: "balance",
   },
   subtitle: {
-    margin: "12px 0 0 0",
+    margin: "4px 0 0 0",
     color: "#9cb0d1",
     maxWidth: 760,
-    lineHeight: 1.5,
+    lineHeight: 1.45,
     fontSize: 18,
   },
   yearBox: {
     minWidth: 160,
-    minHeight: 112,
+    minHeight: 92,
     width: "100%",
-    background: "rgba(10, 18, 34, 0.7)",
-    border: "1px solid rgba(72, 100, 145, 0.35)",
-    borderRadius: 18,
+    background: "rgba(10, 18, 34, 0.72)",
+    border: "1px solid rgba(72, 100, 145, 0.28)",
+    borderRadius: 22,
     padding: 16,
-    boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
+    boxShadow: "0 18px 36px rgba(4, 8, 18, 0.16)",
     backdropFilter: "blur(10px)",
   },
   statusCard: {
-    minHeight: 112,
+    minHeight: 92,
     width: "100%",
     padding: 16,
-    borderRadius: 18,
-    background: "rgba(12, 31, 42, 0.82)",
-    border: "1px solid rgba(78, 240, 168, 0.20)",
-    boxShadow: "0 14px 40px rgba(0,0,0,0.16)",
+    borderRadius: 22,
+    background: "rgba(9, 32, 35, 0.72)",
+    border: "1px solid rgba(78, 240, 168, 0.16)",
+    boxShadow: "0 18px 36px rgba(4, 8, 18, 0.14)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -1953,9 +1963,9 @@ const styles = {
     justifyContent: "center",
     minHeight: 42,
     padding: "0 14px",
-    borderRadius: 12,
-    background: "rgba(78, 240, 168, 0.10)",
-    border: "1px solid rgba(78, 240, 168, 0.24)",
+    borderRadius: 14,
+    background: "rgba(78, 240, 168, 0.08)",
+    border: "1px solid rgba(78, 240, 168, 0.18)",
     color: "#8cf1c6",
     fontWeight: 800,
     fontSize: 15,
@@ -2001,20 +2011,20 @@ const styles = {
   tabsWrap: {
     display: "flex",
     gap: 10,
-    marginBottom: 24,
-    scrollbarWidth: "thin",
+    marginBottom: 22,
     width: "100%",
   },
   tab: {
-    background: "rgba(17, 29, 49, 0.78)",
+    background: "rgba(17, 29, 49, 0.74)",
     color: "#d8e4ff",
-    border: "1px solid rgba(56, 82, 120, 0.85)",
+    border: "1px solid rgba(56, 82, 120, 0.72)",
     borderRadius: 14,
     padding: "12px 18px",
     cursor: "pointer",
     backdropFilter: "blur(8px)",
     whiteSpace: "nowrap",
     flexShrink: 0,
+    fontWeight: 600,
   },
   activeTab: {
     background: "linear-gradient(180deg, rgba(35, 65, 103, 0.96) 0%, rgba(25, 47, 77, 0.96) 100%)",
@@ -2031,17 +2041,17 @@ const styles = {
     gap: 18,
   },
   card: {
-    background: "rgba(14, 24, 40, 0.80)",
-    border: "1px solid rgba(61, 89, 130, 0.42)",
-    borderRadius: 24,
-    padding: 20,
+    background: "rgba(12, 22, 38, 0.82)",
+    border: "1px solid rgba(61, 89, 130, 0.34)",
+    borderRadius: 26,
+    padding: 22,
     boxSizing: "border-box",
-    boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
+    boxShadow: "0 22px 56px rgba(0,0,0,0.18)",
     backdropFilter: "blur(12px)",
   },
   heroCard: {
-    padding: 22,
-    background: "linear-gradient(145deg, rgba(18, 34, 58, 0.92) 0%, rgba(11, 22, 39, 0.92) 100%)",
+    padding: 24,
+    background: "linear-gradient(145deg, rgba(18, 34, 58, 0.90) 0%, rgba(10, 21, 39, 0.92) 100%)",
   },
   monthSnapshotCard: {
     minHeight: 100,
@@ -2059,9 +2069,9 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 58,
+    fontSize: 64,
     fontWeight: 800,
-    letterSpacing: -1,
+    letterSpacing: -1.2,
   },
   heroBadge: {
     padding: "10px 14px",
