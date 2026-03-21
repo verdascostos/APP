@@ -31,7 +31,8 @@ const CATEGORIES = [
   "Transporte",
   "Apuestas",
   "Inversiones",
-  "Sueldo"
+  "Sueldo",
+  "Honorarios",
   "otro",
 ];
 
