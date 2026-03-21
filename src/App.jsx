@@ -114,6 +114,45 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const root = document.getElementById("root");
+    const html = document.documentElement;
+    const body = document.body;
+
+    const previous = {
+      rootMaxWidth: root?.style.maxWidth || "",
+      rootWidth: root?.style.width || "",
+      rootMargin: root?.style.margin || "",
+      rootPadding: root?.style.padding || "",
+      htmlOverflowX: html.style.overflowX || "",
+      bodyOverflowX: body.style.overflowX || "",
+      bodyMargin: body.style.margin || "",
+    };
+
+    if (root) {
+      root.style.maxWidth = "none";
+      root.style.width = "100%";
+      root.style.margin = "0";
+      root.style.padding = "0";
+    }
+
+    html.style.overflowX = "hidden";
+    body.style.overflowX = "hidden";
+    body.style.margin = "0";
+
+    return () => {
+      if (root) {
+        root.style.maxWidth = previous.rootMaxWidth;
+        root.style.width = previous.rootWidth;
+        root.style.margin = previous.rootMargin;
+        root.style.padding = previous.rootPadding;
+      }
+      html.style.overflowX = previous.htmlOverflowX;
+      body.style.overflowX = previous.bodyOverflowX;
+      body.style.margin = previous.bodyMargin;
+    };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -351,38 +390,39 @@ export default function App() {
   const headerRightStyle = {
     ...styles.headerRight,
     display: "grid",
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(280px, 360px) minmax(0, 1fr)",
-    alignItems: isTablet ? "stretch" : "center",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(300px, 380px) minmax(0, 1fr)",
+    alignItems: "center",
     width: "100%",
-    gap: isPhone ? 12 : 20,
+    gap: isPhone ? 12 : 24,
+    minWidth: 0,
   };
 
   const userCardStyle = {
     ...styles.userCard,
     width: "100%",
-    maxWidth: isTablet ? "100%" : 420,
+    maxWidth: isTablet ? "100%" : 380,
     flexShrink: 0,
+    justifySelf: "start",
   };
 
   const headerControlsGroupStyle = {
-    display: "flex",
-    flexDirection: isPhone ? "column" : "row",
-    alignItems: isPhone ? "stretch" : "center",
-    justifyContent: isTablet ? "flex-start" : "flex-end",
+    display: "grid",
+    gridTemplateColumns: isPhone ? "1fr" : "minmax(190px, 210px) auto",
+    alignItems: "center",
+    justifyContent: isTablet ? "stretch" : "end",
+    justifySelf: isTablet ? "stretch" : "end",
     gap: isPhone ? 12 : 18,
     width: "100%",
     minWidth: 0,
-    flexWrap: "wrap",
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
     width: "100%",
     minWidth: 0,
-    maxWidth: isPhone ? "100%" : 220,
+    maxWidth: isPhone ? "100%" : 210,
     minHeight: isPhone ? 76 : 78,
     padding: isPhone ? 12 : "12px 14px",
-    flex: isPhone ? "1 1 100%" : "0 0 220px",
   };
 
   const heroBottomStackStyle = {
@@ -393,13 +433,12 @@ export default function App() {
 
   const topBarActionsStyle = {
     ...styles.topBarActions,
-    justifyContent: isPhone ? "flex-start" : isTablet ? "flex-start" : "flex-end",
-    alignItems: isPhone ? "stretch" : "center",
+    justifyContent: "flex-start",
+    alignItems: "center",
     minHeight: "auto",
-    gap: 16,
-    flexWrap: "nowrap",
+    gap: isPhone ? 10 : 16,
+    flexWrap: isTablet ? "wrap" : "nowrap",
     minWidth: 0,
-    flex: "0 1 auto",
   };
 
   const titleStyle = {
@@ -417,18 +456,17 @@ export default function App() {
 
   const tabsWrapStyle = {
     ...styles.tabsWrap,
-    flexWrap: isTablet ? "nowrap" : "wrap",
-    overflowX: isTablet ? "auto" : "visible",
-    paddingBottom: isTablet ? 4 : 0,
+    flexWrap: isPhone ? "nowrap" : "wrap",
+    overflowX: isPhone ? "auto" : "visible",
+    paddingBottom: isPhone ? 4 : 0,
     marginBottom: 24,
     scrollbarWidth: "none",
     msOverflowStyle: "none",
-    minWidth: 0,
   };
 
   const dashboardGrid = {
     ...styles.dashboardGrid,
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.78fr) minmax(320px, 0.82fr)",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.78fr) minmax(340px, 0.82fr)",
     alignItems: "start",
   };
   const monthGrid = {
@@ -1906,14 +1944,14 @@ const styles = {
   page: {
     minHeight: "100vh",
     width: "100%",
-    maxWidth: "100%",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
     padding: "clamp(10px, 1vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
-    overflowX: "hidden",
+    overflowX: "clip",
+    overflowY: "visible",
   },
   glowTop: {
     position: "absolute",
@@ -1939,11 +1977,10 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: "100%",
+    maxWidth: "none",
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
-    minWidth: 0,
   },
   header: {
     display: "grid",
@@ -1955,16 +1992,16 @@ const styles = {
   headerRight: {
     display: "grid",
     gap: 14,
-    justifyContent: "stretch",
+    justifyContent: "start",
     width: "100%",
     minWidth: 0,
   },
   topBarActions: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
     gap: 12,
-    flexWrap: "nowrap",
+    flexWrap: "wrap",
     minWidth: 0,
   },
   titleBlock: {
@@ -1998,14 +2035,13 @@ const styles = {
     padding: 14,
     boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
     backdropFilter: "blur(10px)",
-    boxSizing: "border-box",
   },
   statusInline: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     gap: 8,
-    minWidth: 0,
+    minWidth: 128,
     flexShrink: 0,
   },
   statusInlineLabel: {
@@ -2083,7 +2119,6 @@ const styles = {
     marginBottom: 28,
     width: "100%",
     alignItems: "center",
-    minWidth: 0,
   },
   tab: {
     background: "rgba(13, 23, 39, 0.62)",
@@ -2390,7 +2425,7 @@ const styles = {
   },
   quickEntryBox: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gridTemplateColumns: "minmax(220px, 2fr) minmax(140px, 1fr) 110px minmax(180px, 1.2fr)",
     gap: 10,
     marginBottom: 10,
   },
