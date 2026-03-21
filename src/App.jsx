@@ -386,6 +386,16 @@ export default function App() {
     );
   }, [monthSummary]);
 
+  const worstARSMonth = useMemo(() => {
+    return MONTHS.reduce(
+      (worst, month) =>
+        monthSummary[month]?.balanceARS < worst.value
+          ? { month, value: monthSummary[month]?.balanceARS || 0 }
+          : worst,
+      { month: MONTHS[0], value: monthSummary[MONTHS[0]]?.balanceARS || 0 }
+    );
+  }, [monthSummary]);
+
   const bestUSDMonth = useMemo(() => {
     return MONTHS.reduce(
       (best, month) =>
@@ -397,7 +407,6 @@ export default function App() {
   }, [monthSummary]);
 
   const avgBalanceARS = totals.balanceARS / 12;
-  const avgBalanceUSD = totals.balanceUSD / 12;
   const annualSavingsRate = totals.ingresosARS > 0 ? (totals.balanceARS / totals.ingresosARS) * 100 : 0;
   const currentMonthSavingsRate = currentMonthSummary.ingresosARS > 0 ? (currentMonthSummary.balanceARS / currentMonthSummary.ingresosARS) * 100 : 0;
 
@@ -588,10 +597,10 @@ export default function App() {
                     tone="green"
                   />
                   <MiniPanel
-                    title="Promedio mensual USD"
-                    mainValue={`US$ ${formatUSD(avgBalanceUSD)}`}
-                    secondary="Balance promedio"
-                    tone="gold"
+                    title="Peor mes ARS"
+                    mainValue={`$ ${formatARS(worstARSMonth.value)}`}
+                    secondary={worstARSMonth.month}
+                    tone="red"
                   />
                 </div>
               </div>
