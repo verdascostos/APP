@@ -85,7 +85,7 @@ export default function App() {
   const [loadedYear, setLoadedYear] = useState(null);
   const [cloudStatus, setCloudStatus] = useState("Conectando...");
   const [cloudError, setCloudError] = useState("");
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("todas");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("Todas");
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
