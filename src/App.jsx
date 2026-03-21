@@ -18,6 +18,22 @@ const MONTHS = [
   "Diciembre",
 ];
 
+const CATEGORIES = [
+  "casa",
+  "comida",
+  "farmacia",
+  "mantenimiento",
+  "ocio",
+  "regalos",
+  "salidas/joda",
+  "supermercado",
+  "telefono",
+  "transporte",
+  "apuestas",
+  "inversiones",
+  "otro",
+];
+
 const emptyMonth = () => ({
   ingresos: [],
   gastos: [],
@@ -41,8 +57,12 @@ const hydrateYearData = (months = {}) => {
     base[month] = {
       ...emptyMonth(),
       ...incoming,
-      ingresos: Array.isArray(incoming.ingresos) ? incoming.ingresos : [],
-      gastos: Array.isArray(incoming.gastos) ? incoming.gastos : [],
+      ingresos: Array.isArray(incoming.ingresos)
+        ? incoming.ingresos.map((item) => ({ ...item, categoria: item.categoria || "otro" }))
+        : [],
+      gastos: Array.isArray(incoming.gastos)
+        ? incoming.gastos.map((item) => ({ ...item, categoria: item.categoria || "otro" }))
+        : [],
     };
   });
 
@@ -222,6 +242,7 @@ export default function App() {
           descripcion: entryData.descripcion,
           monto: entryData.monto,
           moneda: entryData.moneda,
+          categoria: entryData.categoria || "otro",
         },
       ],
     }));
@@ -688,6 +709,7 @@ function EntrySection({ title, entries, onAdd, onDelete }) {
     descripcion: "",
     monto: "",
     moneda: "ARS",
+    categoria: "otro",
   });
 
   const saveEntry = () => {
@@ -697,9 +719,10 @@ function EntrySection({ title, entries, onAdd, onDelete }) {
       descripcion: draft.descripcion.trim(),
       monto: Number(draft.monto) || 0,
       moneda: draft.moneda,
+      categoria: draft.categoria,
     });
 
-    setDraft({ descripcion: "", monto: "", moneda: draft.moneda });
+    setDraft({ descripcion: "", monto: "", moneda: draft.moneda, categoria: draft.categoria });
   };
 
   const handleKeyDown = (e) => {
@@ -744,9 +767,22 @@ function EntrySection({ title, entries, onAdd, onDelete }) {
           <option value="ARS">ARS</option>
           <option value="USD">USD</option>
         </select>
+
+        <select
+          style={{ ...styles.input, ...styles.quickInputCategory }}
+          value={draft.categoria}
+          onChange={(e) => setDraft((prev) => ({ ...prev, categoria: e.target.value }))}
+          onKeyDown={handleKeyDown}
+        >
+          {CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <p style={styles.enterHint}>Escribís motivo y valor. Apretás Enter y se guarda.</p>
+      <p style={styles.enterHint}>Escribís motivo, valor y categoría. Apretás Enter y se guarda.</p>
 
       {entries.length === 0 ? (
         <div style={styles.emptyBox}>Todavía no cargaste nada.</div>
@@ -755,6 +791,7 @@ function EntrySection({ title, entries, onAdd, onDelete }) {
           <div key={entry.id} style={styles.simpleRow}>
             <div style={styles.simpleRowLeft}>
               <span style={styles.simpleRowLabel}>{entry.descripcion}</span>
+              <div style={styles.categoryBadge}>{entry.categoria || "otro"}</div>
             </div>
 
             <div style={styles.simpleRowRight}>
@@ -1258,7 +1295,7 @@ const styles = {
   },
   quickEntryBox: {
     display: "grid",
-    gridTemplateColumns: "2fr 1fr 110px",
+    gridTemplateColumns: "2fr 1fr 110px 170px",
     gap: 10,
     marginBottom: 10,
   },
@@ -1269,6 +1306,9 @@ const styles = {
     minWidth: 0,
   },
   quickInputCurrency: {
+    minWidth: 0,
+  },
+  quickInputCategory: {
     minWidth: 0,
   },
   enterHint: {
@@ -1291,6 +1331,10 @@ const styles = {
   simpleRowLeft: {
     minWidth: 0,
     flex: 1,
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
   },
   simpleRowRight: {
     display: "flex",
@@ -1302,6 +1346,18 @@ const styles = {
     color: "#ecf2ff",
     fontSize: 15,
     wordBreak: "break-word",
+  },
+  categoryBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "5px 10px",
+    borderRadius: 999,
+    background: "rgba(112, 195, 255, 0.10)",
+    border: "1px solid rgba(112, 195, 255, 0.22)",
+    color: "#9bd7ff",
+    fontSize: 12,
+    fontWeight: 700,
+    textTransform: "capitalize",
   },
   simpleRowAmount: {
     color: "#d9e8ff",
