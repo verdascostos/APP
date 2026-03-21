@@ -345,6 +345,7 @@ export default function App() {
     ...styles.header,
     gridTemplateColumns: "1fr",
     alignItems: "stretch",
+    gap: isPhone ? 18 : 28,
   };
 
   const headerRightStyle = {
@@ -355,21 +356,28 @@ export default function App() {
       : isPhone
       ? "1fr"
       : isTablet
-      ? "repeat(2, minmax(0, 1fr))"
-      : "minmax(340px, 1.35fr) minmax(190px, 0.8fr) minmax(220px, 0.86fr) minmax(220px, 0.92fr)",
+      ? "minmax(0, 1fr) minmax(220px, 0.62fr)"
+      : "minmax(360px, 1.35fr) minmax(220px, 0.58fr) auto",
     alignItems: "stretch",
+  };
+
+  const topBarActionsStyle = {
+    ...styles.topBarActions,
+    gridColumn: isPhone ? "auto" : isTablet ? "1 / -1" : "auto",
+    justifySelf: isTablet ? "stretch" : "end",
+    minHeight: isPhone ? "auto" : 86,
   };
 
   const titleStyle = {
     ...styles.title,
-    fontSize: isTinyPhone ? 34 : isPhone ? 44 : isTablet ? 56 : isLaptop ? 64 : 72,
+    fontSize: isTinyPhone ? 34 : isPhone ? 42 : isTablet ? 50 : isLaptop ? 60 : 68,
     textAlign: "left",
-    maxWidth: isTablet ? "100%" : "none",
+    maxWidth: isTablet ? "100%" : 980,
   };
 
   const subtitleStyle = {
     ...styles.subtitle,
-    maxWidth: isTablet ? "100%" : 1180,
+    maxWidth: isTablet ? "100%" : 860,
     textAlign: "left",
   };
 
@@ -377,7 +385,7 @@ export default function App() {
     ...styles.tabsWrap,
     flexWrap: isTablet ? "nowrap" : "wrap",
     overflowX: isTablet ? "auto" : "visible",
-    paddingBottom: isTablet ? 6 : 0,
+    paddingBottom: isTablet ? 4 : 0,
     marginBottom: 24,
     scrollbarWidth: "none",
     msOverflowStyle: "none",
@@ -754,14 +762,19 @@ export default function App() {
               </select>
             </div>
 
-            <div style={styles.statusCard}>
-              <div style={styles.statusLabel}>Estado</div>
-              <div style={styles.statusPill}>{cloudStatus}</div>
-            </div>
+            <div style={topBarActionsStyle}>
+              <div style={styles.statusInline}>
+                <div style={styles.statusInlineLabel}>Estado</div>
+                <div style={styles.statusPill}>
+                  <span style={styles.statusDot} />
+                  {cloudStatus}
+                </div>
+              </div>
 
-            <button style={styles.logoutButton} onClick={handleLogout}>
-              Cerrar sesión
-            </button>
+              <button style={styles.logoutButton} onClick={handleLogout}>
+                Cerrar sesión
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1677,18 +1690,18 @@ const styles = {
     position: "relative",
     zIndex: 1,
     width: "100%",
-    padding: "32px 0",
+    padding: "20px 0",
   },
   authCard: {
     width: "100%",
-    maxWidth: 580,
-    background: "linear-gradient(180deg, rgba(14, 24, 40, 0.9) 0%, rgba(9, 16, 28, 0.9) 100%)",
-    border: "1px solid rgba(61, 89, 130, 0.32)",
-    borderRadius: 30,
-    padding: 28,
+    maxWidth: 560,
+    background: "rgba(14, 24, 40, 0.88)",
+    border: "1px solid rgba(61, 89, 130, 0.42)",
+    borderRadius: 28,
+    padding: 24,
     boxSizing: "border-box",
-    boxShadow: "0 24px 56px rgba(0,0,0,0.24)",
-    backdropFilter: "blur(14px)",
+    boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
+    backdropFilter: "blur(12px)",
   },
   loadingCard: {
     maxWidth: 360,
@@ -1806,49 +1819,48 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 78,
+    minHeight: 86,
     padding: "18px 22px",
     borderRadius: 22,
-    background: "linear-gradient(180deg, rgba(86, 144, 214, 0.16) 0%, rgba(35, 72, 118, 0.18) 100%)",
-    border: "1px solid rgba(112, 195, 255, 0.18)",
+    background: "linear-gradient(180deg, rgba(18, 32, 52, 0.88) 0%, rgba(11, 22, 38, 0.92) 100%)",
+    border: "1px solid rgba(90, 120, 170, 0.20)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    alignItems: "flex-start",
-    gap: 5,
-    boxShadow: "0 16px 34px rgba(3, 9, 20, 0.16)",
+    gap: 6,
+    boxShadow: "0 18px 34px rgba(3, 9, 20, 0.14)",
   },
   userMetaLabel: {
     fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: "0.08em",
-    color: "#8abfff",
+    color: "#7fb4ee",
     fontWeight: 700,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   userName: {
     fontWeight: 800,
-    color: "#e8eef9",
-    lineHeight: 1.1,
-    fontSize: 20,
+    color: "#eef4ff",
+    lineHeight: 1.05,
+    fontSize: 18,
   },
   userEmail: {
-    fontSize: 13,
-    color: "#9cb0d1",
-    marginTop: 1,
+    fontSize: 12,
+    color: "#91a8cb",
+    marginTop: 2,
   },
   logoutButton: {
-    minHeight: 78,
-    width: "100%",
-    borderRadius: 22,
-    padding: "0 20px",
-    background: "linear-gradient(180deg, rgba(255, 122, 140, 0.12) 0%, rgba(124, 46, 61, 0.16) 100%)",
-    border: "1px solid rgba(255, 122, 140, 0.16)",
+    minHeight: 44,
+    borderRadius: 14,
+    padding: "0 18px",
+    background: "rgba(255, 122, 140, 0.08)",
+    border: "1px solid rgba(255, 122, 140, 0.18)",
     color: "#ffb7c2",
-    fontWeight: 800,
+    fontWeight: 700,
     cursor: "pointer",
-    fontSize: 17,
-    boxShadow: "0 16px 34px rgba(4, 8, 18, 0.16)",
+    fontSize: 14,
+    boxShadow: "none",
+    whiteSpace: "nowrap",
   },
 
   page: {
@@ -1859,7 +1871,7 @@ const styles = {
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: "clamp(14px, 1.25vw, 28px)",
+    padding: "clamp(10px, 1vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
     overflow: "hidden",
@@ -1888,7 +1900,7 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: 1920,
+    maxWidth: 1760,
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
@@ -1896,84 +1908,91 @@ const styles = {
   header: {
     display: "grid",
     gridTemplateColumns: "1fr",
-    alignItems: "stretch",
-    gap: 20,
-    marginBottom: 24,
+    alignItems: "center",
+    gap: 26,
+    marginBottom: 28,
   },
   headerRight: {
     display: "grid",
-    gap: 14,
+    gap: 16,
     justifyContent: "stretch",
     width: "100%",
+  },
+  topBarActions: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 12,
+    flexWrap: "wrap",
   },
   titleBlock: {
     display: "flex",
     flexDirection: "column",
-    gap: 10,
-    marginBottom: 2,
+    gap: 14,
+    marginBottom: 10,
   },
   title: {
     margin: 0,
     fontSize: 52,
-    lineHeight: 0.98,
-    letterSpacing: "-0.04em",
-    maxWidth: "none",
+    lineHeight: 0.96,
+    letterSpacing: "-0.045em",
+    maxWidth: 980,
     textWrap: "balance",
   },
   subtitle: {
     margin: 0,
-    color: "#9cb0d1",
-    maxWidth: 1100,
-    lineHeight: 1.5,
+    color: "#94a8cb",
+    maxWidth: 860,
+    lineHeight: 1.6,
     fontSize: 18,
   },
   yearBox: {
     minWidth: 160,
-    minHeight: 78,
+    minHeight: 86,
     width: "100%",
-    background: "linear-gradient(180deg, rgba(8, 17, 31, 0.84) 0%, rgba(7, 13, 24, 0.88) 100%)",
-    border: "1px solid rgba(72, 100, 145, 0.22)",
+    background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
+    border: "1px solid rgba(72, 100, 145, 0.18)",
     borderRadius: 22,
     padding: 16,
-    boxShadow: "0 16px 34px rgba(4, 8, 18, 0.16)",
+    boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
     backdropFilter: "blur(10px)",
+  },
+  statusInline: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     gap: 8,
+    minWidth: 136,
   },
-  statusCard: {
-    minHeight: 78,
-    width: "100%",
-    padding: 16,
-    borderRadius: 22,
-    background: "linear-gradient(180deg, rgba(7, 28, 29, 0.82) 0%, rgba(6, 20, 21, 0.86) 100%)",
-    border: "1px solid rgba(78, 240, 168, 0.14)",
-    boxShadow: "0 16px 34px rgba(4, 8, 18, 0.14)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    gap: 8,
-  },
-  statusLabel: {
-    fontSize: 12,
+  statusInlineLabel: {
+    fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: "0.08em",
-    color: "#8fd8ba",
+    color: "#8ca6bf",
     fontWeight: 700,
   },
   statusPill: {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 38,
+    gap: 8,
+    minHeight: 42,
     padding: "0 14px",
-    borderRadius: 14,
+    borderRadius: 999,
     background: "rgba(78, 240, 168, 0.08)",
-    border: "1px solid rgba(78, 240, 168, 0.16)",
-    color: "#8cf1c6",
+    border: "1px solid rgba(78, 240, 168, 0.18)",
+    color: "#87e5bc",
     fontWeight: 800,
-    fontSize: 15,
+    fontSize: 14,
+    alignSelf: "flex-start",
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    background: "#4ef0a8",
+    boxShadow: "0 0 0 4px rgba(78, 240, 168, 0.14)",
+    flexShrink: 0,
   },
   errorBanner: {
     marginBottom: 18,
@@ -2016,27 +2035,26 @@ const styles = {
   tabsWrap: {
     display: "flex",
     gap: 10,
-    marginBottom: 24,
+    marginBottom: 28,
     width: "100%",
     alignItems: "center",
   },
   tab: {
-    background: "rgba(13, 23, 39, 0.74)",
+    background: "rgba(13, 23, 39, 0.62)",
     color: "#d8e4ff",
-    border: "1px solid rgba(56, 82, 120, 0.52)",
+    border: "1px solid rgba(56, 82, 120, 0.42)",
     borderRadius: 14,
-    padding: "11px 18px",
+    padding: "10px 18px",
     cursor: "pointer",
     backdropFilter: "blur(8px)",
     whiteSpace: "nowrap",
     flexShrink: 0,
     fontWeight: 600,
-    transition: "transform 0.18s ease, border-color 0.18s ease, background 0.18s ease",
   },
   activeTab: {
-    background: "linear-gradient(180deg, rgba(42, 78, 124, 0.92) 0%, rgba(23, 45, 74, 0.96) 100%)",
-    border: "1px solid rgba(98, 156, 230, 0.72)",
-    boxShadow: "0 8px 24px rgba(63, 116, 185, 0.18)",
+    background: "linear-gradient(180deg, rgba(40, 74, 116, 0.88) 0%, rgba(24, 44, 70, 0.94) 100%)",
+    border: "1px solid rgba(98, 156, 230, 0.58)",
+    boxShadow: "0 8px 20px rgba(63, 116, 185, 0.14)",
   },
   statsGrid: {
     display: "grid",
@@ -2048,17 +2066,17 @@ const styles = {
     gap: 18,
   },
   card: {
-    background: "linear-gradient(180deg, rgba(12, 22, 38, 0.82) 0%, rgba(8, 17, 29, 0.86) 100%)",
-    border: "1px solid rgba(61, 89, 130, 0.28)",
+    background: "linear-gradient(180deg, rgba(12, 22, 38, 0.80) 0%, rgba(8, 17, 29, 0.84) 100%)",
+    border: "1px solid rgba(61, 89, 130, 0.22)",
     borderRadius: 24,
     padding: 22,
     boxSizing: "border-box",
-    boxShadow: "0 22px 56px rgba(0,0,0,0.16)",
+    boxShadow: "0 20px 46px rgba(0,0,0,0.13)",
     backdropFilter: "blur(12px)",
   },
   heroCard: {
-    padding: 28,
-    background: "linear-gradient(145deg, rgba(18, 34, 58, 0.88) 0%, rgba(10, 21, 39, 0.94) 100%)",
+    padding: 24,
+    background: "linear-gradient(145deg, rgba(18, 34, 58, 0.90) 0%, rgba(10, 21, 39, 0.92) 100%)",
   },
   monthSnapshotCard: {
     minHeight: 100,
@@ -2076,10 +2094,9 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 74,
+    fontSize: 64,
     fontWeight: 800,
-    letterSpacing: -1.5,
-    lineHeight: 0.96,
+    letterSpacing: -1.2,
   },
   heroBadge: {
     padding: "10px 14px",
@@ -2090,11 +2107,11 @@ const styles = {
     fontWeight: 700,
   },
   progressBlock: {
-    marginTop: 20,
-    padding: 16,
+    marginTop: 18,
+    padding: 14,
     borderRadius: 18,
-    background: "rgba(6, 14, 25, 0.64)",
-    border: "1px solid rgba(73, 102, 143, 0.24)",
+    background: "rgba(9, 18, 30, 0.60)",
+    border: "1px solid rgba(73, 102, 143, 0.32)",
   },
   progressHeader: {
     display: "flex",
@@ -2181,12 +2198,8 @@ const styles = {
     flexWrap: "wrap",
   },
   miniPanel: {
-    borderRadius: 20,
-    padding: "18px",
-    minHeight: 112,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
+    borderRadius: 18,
+    padding: 14,
   },
   miniPanelTitle: {
     fontSize: 13,
@@ -2194,10 +2207,9 @@ const styles = {
     opacity: 0.9,
   },
   miniPanelValue: {
-    fontSize: 34,
+    fontSize: 24,
     fontWeight: 800,
-    marginBottom: 8,
-    lineHeight: 1,
+    marginBottom: 6,
   },
   miniPanelSecondary: {
     fontSize: 13,
@@ -2332,7 +2344,7 @@ const styles = {
   },
   quickEntryBox: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(165px, 1fr))",
+    gridTemplateColumns: "minmax(220px, 2fr) minmax(140px, 1fr) 110px minmax(180px, 1.2fr)",
     gap: 10,
     marginBottom: 10,
   },
