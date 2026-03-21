@@ -1,7 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db, loginAnonimo } from "./firebase";
+import { auth, db } from "./firebase";
 
 const MONTHS = [
   "Enero",
@@ -37,6 +44,8 @@ const CATEGORIES = [
   "Otros",
 ];
 
+const DEFAULT_CATEGORY = "Otros";
+
 const emptyMonth = () => ({
   ingresos: [],
   gastos: [],
@@ -61,10 +70,10 @@ const hydrateYearData = (months = {}) => {
       ...emptyMonth(),
       ...incoming,
       ingresos: Array.isArray(incoming.ingresos)
-        ? incoming.ingresos.map((item) => ({ ...item, categoria: item.categoria || "otro" }))
+        ? incoming.ingresos.map((item) => ({ ...item, categoria: item.categoria || DEFAULT_CATEGORY }))
         : [],
       gastos: Array.isArray(incoming.gastos)
-        ? incoming.gastos.map((item) => ({ ...item, categoria: item.categoria || "otro" }))
+        ? incoming.gastos.map((item) => ({ ...item, categoria: item.categoria || DEFAULT_CATEGORY }))
         : [],
     };
   });
@@ -86,6 +95,17 @@ export default function App() {
   const [cloudStatus, setCloudStatus] = useState("Conectando...");
   const [cloudError, setCloudError] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("Todas");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authView, setAuthView] = useState("login");
+  const [authForm, setAuthForm] = useState({
+    nombre: "",
+    email: "",
+    password: "",
+    repeatPassword: "",
+  });
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authInfo, setAuthInfo] = useState("");
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -96,25 +116,24 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (cancelled) return;
 
+      setAuthReady(true);
+
       if (user) {
+        setCurrentUser(user);
         setUid(user.uid);
-        setAuthReady(true);
         setCloudStatus("Sesión conectada");
+        setAuthError("");
         return;
       }
 
-      try {
-        setCloudStatus("Iniciando sesión...");
-        await loginAnonimo();
-      } catch (error) {
-        console.error(error);
-        if (cancelled) return;
-        setCloudStatus("Error de autenticación");
-        setCloudError("No se pudo iniciar la sesión anónima en Firebase.");
-      }
+      setCurrentUser(null);
+      setUid("");
+      setLoadedYear(null);
+      setData(createInitialYearData());
+      setCloudStatus("Esperando inicio de sesión");
     });
 
     return () => {
@@ -203,6 +222,120 @@ export default function App() {
     return () => clearTimeout(timeout);
   }, [data, uid, year, loadedYear]);
 
+
+  const resetAuthFeedback = () => {
+    setAuthError("");
+    setAuthInfo("");
+  };
+
+  const updateAuthField = (field, value) => {
+    setAuthForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleRegister = async () => {
+    resetAuthFeedback();
+
+    const nombre = authForm.nombre.trim();
+    const email = authForm.email.trim();
+    const password = authForm.password;
+    const repeatPassword = authForm.repeatPassword;
+
+    if (!nombre) {
+      setAuthError("Ingresá tu nombre.");
+      return;
+    }
+
+    if (!email) {
+      setAuthError("Ingresá tu email.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setAuthError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
+    if (password !== repeatPassword) {
+      setAuthError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      setAuthLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: nombre });
+      setAuthInfo("Cuenta creada correctamente.");
+    } catch (error) {
+      console.error(error);
+      setAuthError(getAuthErrorMessage(error));
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogin = async () => {
+    resetAuthFeedback();
+
+    const email = authForm.email.trim();
+    const password = authForm.password;
+
+    if (!email || !password) {
+      setAuthError("Completá email y contraseña.");
+      return;
+    }
+
+    try {
+      setAuthLoading(true);
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error(error);
+      setAuthError(getAuthErrorMessage(error));
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    resetAuthFeedback();
+
+    const email = authForm.email.trim();
+
+    if (!email) {
+      setAuthError("Ingresá tu email para recuperar la contraseña.");
+      return;
+    }
+
+    try {
+      setAuthLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      setAuthInfo("Si el correo es válido, te enviamos un email para restablecer tu contraseña.");
+    } catch (error) {
+      console.error(error);
+      setAuthError(getAuthErrorMessage(error));
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setSelectedCategoryFilter("Todas");
+      setActiveTab("Dashboard");
+      setCloudError("");
+      setAuthView("login");
+      setAuthForm({
+        nombre: "",
+        email: "",
+        password: "",
+        repeatPassword: "",
+      });
+    } catch (error) {
+      console.error(error);
+      setCloudError("No se pudo cerrar la sesión.");
+    }
+  };
+
   const isMobile = windowWidth < 900;
   const dashboardGrid = {
     ...styles.dashboardGrid,
@@ -254,7 +387,7 @@ export default function App() {
           descripcion: entryData.descripcion,
           monto: entryData.monto,
           moneda: entryData.moneda,
-          categoria: entryData.categoria || "otro",
+          categoria: entryData.categoria || DEFAULT_CATEGORY,
         },
       ],
     }));
@@ -428,7 +561,7 @@ export default function App() {
     MONTHS.forEach((month) => {
       const monthData = data[month] || emptyMonth();
       monthData.gastos.forEach((item) => {
-        const category = item.categoria || "otro";
+        const category = item.categoria || DEFAULT_CATEGORY;
         if (!base[category]) {
           base[category] = { category, ars: 0, usd: 0, count: 0 };
         }
@@ -495,13 +628,35 @@ export default function App() {
 
   const filteredIngresos = useMemo(() => {
     if (selectedCategoryFilter === "Todas") return selectedMonth.ingresos;
-    return selectedMonth.ingresos.filter((entry) => (entry.categoria || "otro") === selectedCategoryFilter);
+    return selectedMonth.ingresos.filter((entry) => (entry.categoria || DEFAULT_CATEGORY) === selectedCategoryFilter);
   }, [selectedMonth.ingresos, selectedCategoryFilter]);
 
   const filteredGastos = useMemo(() => {
     if (selectedCategoryFilter === "Todas") return selectedMonth.gastos;
-    return selectedMonth.gastos.filter((entry) => (entry.categoria || "otro") === selectedCategoryFilter);
+    return selectedMonth.gastos.filter((entry) => (entry.categoria || DEFAULT_CATEGORY) === selectedCategoryFilter);
   }, [selectedMonth.gastos, selectedCategoryFilter]);
+
+
+  if (!authReady) {
+    return <LoadingScreen message="Preparando acceso..." />;
+  }
+
+  if (!currentUser) {
+    return (
+      <AuthScreen
+        authView={authView}
+        setAuthView={setAuthView}
+        authForm={authForm}
+        updateAuthField={updateAuthField}
+        handleLogin={handleLogin}
+        handleRegister={handleRegister}
+        handlePasswordReset={handlePasswordReset}
+        authLoading={authLoading}
+        authError={authError}
+        authInfo={authInfo}
+      />
+    );
+  }
 
   return (
     <div style={styles.page}>
@@ -518,6 +673,10 @@ export default function App() {
           </div>
 
           <div style={styles.headerRight}>
+            <div style={styles.userCard}>
+              <div style={styles.userName}>{currentUser.displayName || "Usuario"}</div>
+              <div style={styles.userEmail}>{currentUser.email}</div>
+            </div>
             <div style={styles.statusPill}>{cloudStatus}</div>
             <div style={styles.yearBox}>
               <label style={styles.label}>Año</label>
@@ -533,6 +692,9 @@ export default function App() {
                 ))}
               </select>
             </div>
+            <button style={styles.logoutButton} onClick={handleLogout}>
+              Cerrar sesión
+            </button>
           </div>
         </div>
 
@@ -883,12 +1045,213 @@ export default function App() {
   );
 }
 
+
+function LoadingScreen({ message }) {
+  return (
+    <div style={styles.authPage}>
+      <div style={{ ...styles.authCard, ...styles.loadingCard }}>
+        <div style={styles.loadingSpinner} />
+        <h2 style={styles.authTitle}>{message}</h2>
+      </div>
+    </div>
+  );
+}
+
+function AuthScreen({
+  authView,
+  setAuthView,
+  authForm,
+  updateAuthField,
+  handleLogin,
+  handleRegister,
+  handlePasswordReset,
+  authLoading,
+  authError,
+  authInfo,
+}) {
+  const submitAction =
+    authView === "register"
+      ? handleRegister
+      : authView === "forgot"
+      ? handlePasswordReset
+      : handleLogin;
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submitAction();
+    }
+  };
+
+  return (
+    <div style={styles.authPage}>
+      <div style={styles.glowTop} />
+      <div style={styles.glowBottom} />
+
+      <div style={styles.authShell}>
+        <div style={styles.authCard}>
+          <div style={styles.authHeader}>
+            <div style={styles.authEyebrow}>ACCESO SEGURO</div>
+            <h1 style={styles.authTitle}>Control de gastos personal</h1>
+            <p style={styles.authSubtitle}>
+              Registrate para guardar tu seguimiento y entrar siempre a tu propia información.
+            </p>
+          </div>
+
+          <div style={styles.authTabs}>
+            <button
+              style={{
+                ...styles.authTab,
+                ...(authView === "login" ? styles.authTabActive : {}),
+              }}
+              onClick={() => setAuthView("login")}
+            >
+              Iniciar sesión
+            </button>
+            <button
+              style={{
+                ...styles.authTab,
+                ...(authView === "register" ? styles.authTabActive : {}),
+              }}
+              onClick={() => setAuthView("register")}
+            >
+              Registrarse
+            </button>
+            <button
+              style={{
+                ...styles.authTab,
+                ...(authView === "forgot" ? styles.authTabActive : {}),
+              }}
+              onClick={() => setAuthView("forgot")}
+            >
+              Olvidé mi contraseña
+            </button>
+          </div>
+
+          {authError ? <div style={styles.authErrorBox}>{authError}</div> : null}
+          {authInfo ? <div style={styles.authInfoBox}>{authInfo}</div> : null}
+
+          {authView === "forgot" ? (
+            <div style={styles.authHelperBox}>
+              Ingresás tu email, Firebase te manda un correo con un enlace de recuperación, abrís ese mail, tocás el link y elegís una nueva contraseña.
+            </div>
+          ) : null}
+
+          <div style={styles.authFormGrid} onKeyDown={handleKeyDown}>
+            {authView === "register" ? (
+              <div>
+                <label style={styles.label}>Nombre</label>
+                <input
+                  style={styles.input}
+                  value={authForm.nombre}
+                  onChange={(e) => updateAuthField("nombre", e.target.value)}
+                  placeholder="Tu nombre"
+                />
+              </div>
+            ) : null}
+
+            <div>
+              <label style={styles.label}>Email</label>
+              <input
+                type="email"
+                style={styles.input}
+                value={authForm.email}
+                onChange={(e) => updateAuthField("email", e.target.value)}
+                placeholder="tu@email.com"
+              />
+            </div>
+
+            {authView !== "forgot" ? (
+              <div>
+                <label style={styles.label}>Contraseña</label>
+                <input
+                  type="password"
+                  style={styles.input}
+                  value={authForm.password}
+                  onChange={(e) => updateAuthField("password", e.target.value)}
+                  placeholder="********"
+                />
+              </div>
+            ) : null}
+
+            {authView === "register" ? (
+              <div>
+                <label style={styles.label}>Repetir contraseña</label>
+                <input
+                  type="password"
+                  style={styles.input}
+                  value={authForm.repeatPassword}
+                  onChange={(e) => updateAuthField("repeatPassword", e.target.value)}
+                  placeholder="********"
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <button style={styles.authPrimaryButton} onClick={submitAction} disabled={authLoading}>
+            {authLoading
+              ? "Procesando..."
+              : authView === "register"
+              ? "Crear cuenta"
+              : authView === "forgot"
+              ? "Enviar mail de recuperación"
+              : "Entrar"}
+          </button>
+
+          <div style={styles.authBottomLinks}>
+            {authView === "login" ? (
+              <>
+                <button style={styles.authLinkButton} onClick={() => setAuthView("register")}>
+                  No tengo cuenta
+                </button>
+                <button style={styles.authLinkButton} onClick={() => setAuthView("forgot")}>
+                  Recuperar contraseña
+                </button>
+              </>
+            ) : authView === "register" ? (
+              <button style={styles.authLinkButton} onClick={() => setAuthView("login")}>
+                Ya tengo cuenta
+              </button>
+            ) : (
+              <button style={styles.authLinkButton} onClick={() => setAuthView("login")}>
+                Volver al login
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getAuthErrorMessage(error) {
+  switch (error?.code) {
+    case "auth/email-already-in-use":
+      return "Ese email ya está registrado.";
+    case "auth/invalid-email":
+      return "El email no es válido.";
+    case "auth/missing-password":
+      return "Ingresá una contraseña.";
+    case "auth/weak-password":
+      return "La contraseña es demasiado débil.";
+    case "auth/invalid-credential":
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+      return "Email o contraseña incorrectos.";
+    case "auth/too-many-requests":
+      return "Demasiados intentos. Probá de nuevo más tarde.";
+    default:
+      return "Ocurrió un error con la autenticación.";
+  }
+}
+
+
 function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
   const [draft, setDraft] = useState({
     descripcion: "",
     monto: "",
     moneda: "ARS",
-    categoria: "otro",
+    categoria: DEFAULT_CATEGORY,
   });
 
   const saveEntry = () => {
@@ -974,7 +1337,7 @@ function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
           <div key={entry.id} style={styles.simpleRow}>
             <div style={styles.simpleRowLeft}>
               <span style={styles.simpleRowLabel}>{entry.descripcion}</span>
-              <div style={styles.categoryBadge}>{entry.categoria || "otro"}</div>
+              <div style={styles.categoryBadge}>{entry.categoria || DEFAULT_CATEGORY}</div>
             </div>
 
             <div style={styles.simpleRowRight}>
@@ -1223,6 +1586,183 @@ const CATEGORY_COLORS = [
 ];
 
 const styles = {
+
+  authPage: {
+    minHeight: "100vh",
+    background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
+    color: "#e8eef9",
+    fontFamily: "Arial, sans-serif",
+    padding: 24,
+    boxSizing: "border-box",
+    position: "relative",
+    overflow: "hidden",
+  },
+  authShell: {
+    minHeight: "calc(100vh - 48px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    zIndex: 1,
+  },
+  authCard: {
+    width: "100%",
+    maxWidth: 520,
+    background: "rgba(14, 24, 40, 0.88)",
+    border: "1px solid rgba(61, 89, 130, 0.42)",
+    borderRadius: 28,
+    padding: 24,
+    boxSizing: "border-box",
+    boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
+    backdropFilter: "blur(12px)",
+  },
+  loadingCard: {
+    maxWidth: 360,
+    textAlign: "center",
+  },
+  loadingSpinner: {
+    width: 54,
+    height: 54,
+    borderRadius: "50%",
+    border: "4px solid rgba(114, 195, 255, 0.18)",
+    borderTopColor: "#72c3ff",
+    margin: "0 auto 18px auto",
+    animation: "spin 1s linear infinite",
+  },
+  authHeader: {
+    marginBottom: 18,
+  },
+  authEyebrow: {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "6px 10px",
+    borderRadius: 999,
+    background: "rgba(112, 195, 255, 0.10)",
+    border: "1px solid rgba(112, 195, 255, 0.22)",
+    color: "#9bd7ff",
+    fontSize: 12,
+    fontWeight: 700,
+    marginBottom: 12,
+  },
+  authTitle: {
+    margin: 0,
+    fontSize: 32,
+    lineHeight: 1.1,
+  },
+  authSubtitle: {
+    margin: "10px 0 0 0",
+    color: "#9cb0d1",
+    lineHeight: 1.5,
+  },
+  authTabs: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: 8,
+    marginBottom: 18,
+  },
+  authTab: {
+    border: "1px solid rgba(56, 82, 120, 0.85)",
+    borderRadius: 12,
+    background: "rgba(17, 29, 49, 0.78)",
+    color: "#d8e4ff",
+    padding: "10px 12px",
+    cursor: "pointer",
+    fontWeight: 700,
+    fontSize: 13,
+  },
+  authTabActive: {
+    background: "linear-gradient(180deg, rgba(35, 65, 103, 0.96) 0%, rgba(25, 47, 77, 0.96) 100%)",
+    border: "1px solid rgba(98, 156, 230, 0.85)",
+    boxShadow: "0 8px 24px rgba(63, 116, 185, 0.22)",
+  },
+  authErrorBox: {
+    marginBottom: 14,
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: "rgba(255, 122, 140, 0.11)",
+    border: "1px solid rgba(255, 122, 140, 0.28)",
+    color: "#ff9baa",
+  },
+  authInfoBox: {
+    marginBottom: 14,
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: "rgba(78, 240, 168, 0.10)",
+    border: "1px solid rgba(78, 240, 168, 0.24)",
+    color: "#8cf1c6",
+  },
+  authHelperBox: {
+    marginBottom: 14,
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: "rgba(114, 195, 255, 0.08)",
+    border: "1px solid rgba(114, 195, 255, 0.20)",
+    color: "#9cbbe0",
+    lineHeight: 1.5,
+    fontSize: 14,
+  },
+  authFormGrid: {
+    display: "grid",
+    gap: 14,
+    marginBottom: 16,
+  },
+  authPrimaryButton: {
+    width: "100%",
+    border: "none",
+    borderRadius: 14,
+    padding: "14px 16px",
+    background: "linear-gradient(180deg, #72c3ff 0%, #3b8fe8 100%)",
+    color: "#06111f",
+    fontWeight: 800,
+    cursor: "pointer",
+    fontSize: 15,
+    marginBottom: 14,
+  },
+  authBottomLinks: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+    justifyContent: "center",
+  },
+  authLinkButton: {
+    border: "none",
+    background: "transparent",
+    color: "#9bd7ff",
+    cursor: "pointer",
+    fontWeight: 700,
+  },
+  userCard: {
+    minHeight: 46,
+    padding: "8px 12px",
+    borderRadius: 14,
+    background: "rgba(112, 195, 255, 0.10)",
+    border: "1px solid rgba(112, 195, 255, 0.22)",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+  },
+  userName: {
+    fontWeight: 700,
+    color: "#e8eef9",
+    lineHeight: 1.1,
+  },
+  userEmail: {
+    fontSize: 12,
+    color: "#9cb0d1",
+    marginTop: 3,
+  },
+  logoutButton: {
+    minHeight: 46,
+    border: "none",
+    borderRadius: 14,
+    padding: "0 16px",
+    background: "rgba(255, 122, 140, 0.14)",
+    border: "1px solid rgba(255, 122, 140, 0.22)",
+    color: "#ff9baa",
+    fontWeight: 800,
+    cursor: "pointer",
+  },
+
   page: {
     minHeight: "100vh",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
