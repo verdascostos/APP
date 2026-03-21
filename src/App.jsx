@@ -33,7 +33,7 @@ const CATEGORIES = [
   "Supermercado",
   "Telefono",
   "Transporte",
-  "otro",
+  "Otros",
 ];
 
 const emptyMonth = () => ({
