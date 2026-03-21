@@ -19,20 +19,20 @@ const MONTHS = [
 ];
 
 const CATEGORIES = [
+  "Apuestas",
   "Casa",
   "Comida",
   "Farmacia",
+  "Honorarios",
+  "Inversiones",
   "Mantenimiento",
   "Ocio",
   "Regalos",
   "Salidas (Ej: Boliche)",
+  "Sueldo",
   "Supermercado",
   "Telefono",
   "Transporte",
-  "Apuestas",
-  "Inversiones",
-  "Sueldo",
-  "Honorarios",
   "otro",
 ];
 
@@ -385,13 +385,13 @@ export default function App() {
     );
   }, [monthSummary]);
 
-  const bestUSDMonth = useMemo(() => {
+  const worstARSMonth = useMemo(() => {
     return MONTHS.reduce(
-      (best, month) =>
-        monthSummary[month]?.ahorroFinalUSD > best.value
-          ? { month, value: monthSummary[month]?.ahorroFinalUSD || 0 }
-          : best,
-      { month: MONTHS[0], value: monthSummary[MONTHS[0]]?.ahorroFinalUSD || 0 }
+      (worst, month) =>
+        monthSummary[month]?.balanceARS < worst.value
+          ? { month, value: monthSummary[month]?.balanceARS || 0 }
+          : worst,
+      { month: MONTHS[0], value: monthSummary[MONTHS[0]]?.balanceARS || 0 }
     );
   }, [monthSummary]);
 
@@ -433,11 +433,9 @@ export default function App() {
       });
     });
 
-    return Object.values(base).sort((a, b) => {
-      if (b.ars !== a.ars) return b.ars - a.ars;
-      if (b.usd !== a.usd) return b.usd - a.usd;
-      return b.count - a.count;
-    });
+    return Object.values(base).sort((a, b) =>
+      a.category.localeCompare(b.category, "es", { sensitivity: "base" })
+    );
   }, [data]);
 
   const visibleCategoryRows = useMemo(() => {
@@ -460,7 +458,7 @@ export default function App() {
     );
   }, [visibleCategoryRows]);
 
-  const topCategoryRows = useMemo(() => visibleCategoryRows.slice(0, 6), [visibleCategoryRows]);
+  const topCategoryRows = useMemo(() => visibleCategoryRows, [visibleCategoryRows]);
 
   const selectedCategoryLabel =
     selectedCategoryFilter === "todas" ? "todas las categorías" : selectedCategoryFilter;
@@ -587,10 +585,10 @@ export default function App() {
                     tone="blue"
                   />
                   <MiniPanel
-                    title="Promedio mensual USD"
-                    mainValue={`US$ ${formatUSD(avgBalanceUSD)}`}
-                    secondary="Balance promedio"
-                    tone="gold"
+                    title="Peor mes ARS"
+                    mainValue={`$ ${formatARS(worstARSMonth.value)}`}
+                    secondary={worstARSMonth.month}
+                    tone="red"
                   />
                 </div>
               </div>
@@ -622,7 +620,7 @@ export default function App() {
 
             <div style={summaryCardsGrid}>
               <InfoCard title="Promedio mensual ARS" value={`$ ${formatARS(avgBalanceARS)}`} subtitle="Balance promedio del año" />
-              <InfoCard title="Pico en USD" value={`US$ ${formatUSD(bestUSDMonth.value)}`} subtitle={`Máximo acumulado en ${bestUSDMonth.month}`} />
+              <InfoCard title="Promedio mensual USD" value={`US$ ${formatUSD(avgBalanceUSD)}`} subtitle="Balance promedio del año" />
               <InfoCard title="Movimientos cargados" value={`${totals.movimientos}`} subtitle="Ingresos + gastos registrados" />
             </div>
 
