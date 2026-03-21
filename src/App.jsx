@@ -343,21 +343,20 @@ export default function App() {
 
   const headerStyle = {
     ...styles.header,
-    flexDirection: isTablet ? "column" : "row",
-    alignItems: isTablet ? "stretch" : "flex-start",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(320px, 0.95fr) minmax(0, 1.25fr)",
+    alignItems: isTablet ? "stretch" : "end",
   };
 
   const headerRightStyle = {
     ...styles.headerRight,
-    width: isTablet ? "100%" : "auto",
-    display: "grid",
+    width: isTablet ? "100%" : "minmax(720px, 58%)",
     gridTemplateColumns: isTinyPhone
       ? "1fr"
       : isPhone
-      ? "1fr 1fr"
+      ? "1fr"
       : isTablet
-      ? "repeat(4, minmax(0, 1fr))"
-      : "repeat(4, minmax(150px, auto))",
+      ? "minmax(0, 1.2fr) minmax(0, 1fr)"
+      : "minmax(260px, 1.25fr) minmax(290px, 0.95fr) minmax(180px, 0.75fr)",
     alignItems: "stretch",
   };
 
@@ -368,14 +367,15 @@ export default function App() {
 
   const subtitleStyle = {
     ...styles.subtitle,
-    maxWidth: isTablet ? "100%" : 760,
+    maxWidth: isTablet ? "100%" : 920,
   };
 
   const tabsWrapStyle = {
     ...styles.tabsWrap,
     flexWrap: "nowrap",
     overflowX: "auto",
-    paddingBottom: 6,
+    paddingBottom: 8,
+    marginBottom: 28,
   };
 
   const dashboardGrid = {
@@ -729,24 +729,33 @@ export default function App() {
 
           <div style={headerRightStyle}>
             <div style={styles.userCard}>
+              <div style={styles.userMetaLabel}>Sesión activa</div>
               <div style={styles.userName}>{currentUser.displayName || "Usuario"}</div>
               <div style={styles.userEmail}>{currentUser.email}</div>
             </div>
-            <div style={styles.statusPill}>{cloudStatus}</div>
-            <div style={styles.yearBox}>
-              <label style={styles.label}>Año</label>
-              <select
-                style={styles.input}
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-              >
-                {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
-                  <option key={optionYear} value={optionYear}>
-                    {optionYear}
-                  </option>
-                ))}
-              </select>
+
+            <div style={styles.headerControlStack}>
+              <div style={styles.yearBox}>
+                <label style={styles.label}>Año</label>
+                <select
+                  style={styles.input}
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                >
+                  {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
+                    <option key={optionYear} value={optionYear}>
+                      {optionYear}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={styles.statusCard}>
+                <div style={styles.statusLabel}>Estado</div>
+                <div style={styles.statusPill}>{cloudStatus}</div>
+              </div>
             </div>
+
             <button style={styles.logoutButton} onClick={handleLogout}>
               Cerrar sesión
             </button>
@@ -1794,19 +1803,29 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 78,
-    padding: "12px 14px",
-    borderRadius: 14,
-    background: "rgba(112, 195, 255, 0.10)",
+    minHeight: 96,
+    padding: "16px 18px",
+    borderRadius: 18,
+    background: "linear-gradient(180deg, rgba(112, 195, 255, 0.12) 0%, rgba(66, 120, 190, 0.12) 100%)",
     border: "1px solid rgba(112, 195, 255, 0.22)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    gap: 4,
+  },
+  userMetaLabel: {
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#8abfff",
+    fontWeight: 700,
+    marginBottom: 2,
   },
   userName: {
-    fontWeight: 700,
+    fontWeight: 800,
     color: "#e8eef9",
     lineHeight: 1.1,
+    fontSize: 18,
   },
   userEmail: {
     fontSize: 12,
@@ -1814,15 +1833,16 @@ const styles = {
     marginTop: 3,
   },
   logoutButton: {
-    minHeight: 78,
-    border: "none",
-    borderRadius: 14,
-    padding: "0 16px",
-    background: "rgba(255, 122, 140, 0.14)",
+    minHeight: 96,
+    borderRadius: 18,
+    padding: "0 20px",
+    background: "linear-gradient(180deg, rgba(255, 122, 140, 0.16) 0%, rgba(134, 50, 66, 0.16) 100%)",
     border: "1px solid rgba(255, 122, 140, 0.22)",
-    color: "#ff9baa",
+    color: "#ffb0bb",
     fontWeight: 800,
     cursor: "pointer",
+    fontSize: 18,
+    boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
   },
 
   page: {
@@ -1830,7 +1850,7 @@ const styles = {
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: 24,
+    padding: "clamp(12px, 1.6vw, 28px)",
     boxSizing: "border-box",
     position: "relative",
     overflow: "hidden",
@@ -1859,25 +1879,22 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: 1560,
+    maxWidth: 1780,
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
   },
   header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 20,
-    flexWrap: "wrap",
-    marginBottom: 24,
+    display: "grid",
+    gridTemplateColumns: "minmax(320px, 1fr) minmax(640px, 1.2fr)",
+    alignItems: "end",
+    gap: 24,
+    marginBottom: 28,
   },
   headerRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    flexWrap: "wrap",
-    justifyContent: "flex-end",
+    display: "grid",
+    gap: 14,
+    justifyContent: "stretch",
   },
   title: {
     margin: 0,
@@ -1894,26 +1911,51 @@ const styles = {
   },
   yearBox: {
     minWidth: 160,
-    minHeight: 78,
+    minHeight: 96,
     background: "rgba(10, 18, 34, 0.7)",
     border: "1px solid rgba(72, 100, 145, 0.35)",
     borderRadius: 18,
-    padding: 14,
+    padding: 16,
     boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
     backdropFilter: "blur(10px)",
+  },
+  headerControlStack: {
+    display: "grid",
+    gridTemplateColumns: "minmax(150px, 0.95fr) minmax(170px, 1fr)",
+    gap: 14,
+    alignItems: "stretch",
+  },
+  statusCard: {
+    minHeight: 96,
+    padding: 16,
+    borderRadius: 18,
+    background: "rgba(12, 31, 42, 0.82)",
+    border: "1px solid rgba(78, 240, 168, 0.20)",
+    boxShadow: "0 14px 40px rgba(0,0,0,0.16)",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    gap: 10,
+  },
+  statusLabel: {
+    fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "#8fd8ba",
+    fontWeight: 700,
   },
   statusPill: {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 78,
+    minHeight: 42,
     padding: "0 14px",
-    borderRadius: 14,
+    borderRadius: 12,
     background: "rgba(78, 240, 168, 0.10)",
     border: "1px solid rgba(78, 240, 168, 0.24)",
     color: "#8cf1c6",
-    fontWeight: 700,
-    fontSize: 14,
+    fontWeight: 800,
+    fontSize: 15,
   },
   errorBanner: {
     marginBottom: 18,
