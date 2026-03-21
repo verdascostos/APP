@@ -336,38 +336,92 @@ export default function App() {
     }
   };
 
-  const isMobile = windowWidth < 900;
+  const isTinyPhone = windowWidth < 480;
+  const isPhone = windowWidth < 720;
+  const isTablet = windowWidth < 1100;
+  const isLaptop = windowWidth < 1360;
+
+  const headerStyle = {
+    ...styles.header,
+    flexDirection: isTablet ? "column" : "row",
+    alignItems: isTablet ? "stretch" : "flex-start",
+  };
+
+  const headerRightStyle = {
+    ...styles.headerRight,
+    width: isTablet ? "100%" : "auto",
+    display: "grid",
+    gridTemplateColumns: isTinyPhone
+      ? "1fr"
+      : isPhone
+      ? "1fr 1fr"
+      : isTablet
+      ? "repeat(4, minmax(0, 1fr))"
+      : "repeat(4, minmax(150px, auto))",
+    alignItems: "stretch",
+  };
+
+  const titleStyle = {
+    ...styles.title,
+    fontSize: isTinyPhone ? 34 : isPhone ? 40 : 52,
+  };
+
+  const subtitleStyle = {
+    ...styles.subtitle,
+    maxWidth: isTablet ? "100%" : 760,
+  };
+
+  const tabsWrapStyle = {
+    ...styles.tabsWrap,
+    flexWrap: "nowrap",
+    overflowX: "auto",
+    paddingBottom: 6,
+  };
+
   const dashboardGrid = {
     ...styles.dashboardGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "1.5fr 1fr",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.65fr) minmax(360px, 0.95fr)",
   };
   const monthGrid = {
     ...styles.monthGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1.65fr) minmax(320px, 0.9fr)",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.65fr) minmax(340px, 0.95fr)",
   };
   const chartsGrid = {
     ...styles.chartsGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+    gridTemplateColumns: isTablet ? "1fr" : "1fr 1fr",
   };
   const statsGrid = {
     ...styles.statsGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "repeat(4, minmax(0, 1fr))",
+    gridTemplateColumns: isPhone
+      ? "1fr"
+      : isTablet
+      ? "repeat(2, minmax(0, 1fr))"
+      : "repeat(4, minmax(0, 1fr))",
   };
   const summaryCardsGrid = {
     ...styles.summaryCardsGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: isTinyPhone
+      ? "1fr"
+      : isTablet
+      ? "repeat(2, minmax(0, 1fr))"
+      : "repeat(3, minmax(0, 1fr))",
   };
   const monthMetaGrid = {
     ...styles.monthMetaGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))",
+    gridTemplateColumns: isPhone ? "1fr" : isTablet ? "repeat(2, minmax(0, 1fr))" : "repeat(3, minmax(0, 1fr))",
   };
   const categoryAnalyticsGrid = {
     ...styles.categoryAnalyticsGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "1fr 1.2fr",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(320px, 0.9fr) minmax(0, 1.1fr)",
   };
   const dashboardFilterGrid = {
     ...styles.dashboardFilterGrid,
-    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+    gridTemplateColumns: isTablet ? "1fr" : "1fr 1fr",
+  };
+
+  const authTabsStyle = {
+    ...styles.authTabs,
+    gridTemplateColumns: isPhone ? "1fr" : "repeat(3, minmax(0, 1fr))",
   };
 
   const updateMonth = (month, updater) => {
@@ -654,32 +708,32 @@ export default function App() {
         authLoading={authLoading}
         authError={authError}
         authInfo={authInfo}
+        windowWidth={windowWidth}
       />
     );
   }
 
   return (
-    <div style={styles.page} className="app-page-root">
-      <ResponsiveStyles />
+    <div style={styles.page}>
       <div style={styles.glowTop} />
       <div style={styles.glowBottom} />
 
-      <div style={styles.container} className="app-container-main">
-        <div style={styles.header} className="app-header">
+      <div style={styles.container}>
+        <div style={headerStyle}>
           <div>
-            <h1 style={styles.title} className="app-title-text">Control de Gastos e Ingresos</h1>
-            <p style={styles.subtitle} className="app-subtitle-text">
+            <h1 style={titleStyle}>Control de Gastos e Ingresos</h1>
+            <p style={subtitleStyle}>
               Seguimiento anual con ahorro acumulado, balance mensual y evolución en dólares.
             </p>
           </div>
 
-          <div style={styles.headerRight} className="app-header-right">
-            <div style={styles.userCard} className="user-card-box surface-card">
+          <div style={headerRightStyle}>
+            <div style={styles.userCard}>
               <div style={styles.userName}>{currentUser.displayName || "Usuario"}</div>
               <div style={styles.userEmail}>{currentUser.email}</div>
             </div>
-            <div style={styles.statusPill} className="status-chip">{cloudStatus}</div>
-            <div style={styles.yearBox} className="year-box-card surface-card">
+            <div style={styles.statusPill}>{cloudStatus}</div>
+            <div style={styles.yearBox}>
               <label style={styles.label}>Año</label>
               <select
                 style={styles.input}
@@ -693,7 +747,7 @@ export default function App() {
                 ))}
               </select>
             </div>
-            <button style={styles.logoutButton} className="logout-btn interactive-btn" onClick={handleLogout}>
+            <button style={styles.logoutButton} onClick={handleLogout}>
               Cerrar sesión
             </button>
           </div>
@@ -701,7 +755,7 @@ export default function App() {
 
         {cloudError ? <div style={styles.errorBanner}>{cloudError}</div> : null}
 
-        <div style={styles.tabsWrap} className="app-tabs">
+        <div style={tabsWrapStyle}>
           <button
             onClick={() => setActiveTab("Dashboard")}
             style={{
@@ -728,8 +782,8 @@ export default function App() {
 
         {activeTab === "Dashboard" ? (
           <>
-            <div style={dashboardGrid} className="dashboard-grid-main">
-              <div style={{ ...styles.card, ...styles.heroCard }} className="surface-card">
+            <div style={dashboardGrid}>
+              <div style={{ ...styles.card, ...styles.heroCard }}>
                 <div style={styles.heroTopRow}>
                   <div>
                     <div style={styles.heroLabel}>Ahorro acumulado</div>
@@ -746,7 +800,7 @@ export default function App() {
                   <ProgressBar value={annualSavingsRate} max={100} color="#4ef0a8" />
                 </div>
 
-                <div style={summaryCardsGrid} className="summary-cards-grid">
+                <div style={summaryCardsGrid}>
                   <MiniPanel
                     title="Mes actual"
                     mainValue={`$ ${formatARS(currentMonthSummary.balanceARS)}`}
@@ -768,10 +822,10 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={{ ...styles.card, ...styles.monthSnapshotCard }} className="surface-card">
+              <div style={{ ...styles.card, ...styles.monthSnapshotCard }}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Foto de {currentMonth}</h2>
-                  <span style={styles.snapshotChip} className="snapshot-chip-text">Mes actual</span>
+                  <h2 style={styles.cardTitle}>Foto de {currentMonth}</h2>
+                  <span style={styles.snapshotChip}>Mes actual</span>
                 </div>
                 <SummaryRow label="Ingresos ARS" value={`$ ${formatARS(currentMonthSummary.ingresosARS)}`} />
                 <SummaryRow label="Gastos ARS" value={`$ ${formatARS(currentMonthSummary.gastosARS)}`} />
@@ -786,18 +840,18 @@ export default function App() {
               </div>
             </div>
 
-            <div style={statsGrid} className="stats-grid-main">
+            <div style={statsGrid}>
               <StatCard title="Ingresos ARS" value={`$ ${formatARS(totals.ingresosARS)}`} accent="#4ef0a8" />
               <StatCard title="Gastos ARS" value={`$ ${formatARS(totals.gastosARS)}`} accent="#ff7a8c" />
               <StatCard title="Balance anual ARS" value={`$ ${formatARS(totals.balanceARS)}`} accent="#88c8ff" />
               <StatCard title="Ahorro final USD" value={`US$ ${formatUSD(finalUSD)}`} accent="#f7d76d" />
             </div>
 
-            <div style={dashboardFilterGrid} className="dashboard-filter-grid">
-              <div style={styles.card} className="surface-card">
+            <div style={dashboardFilterGrid}>
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Filtro por categoría</h2>
-                  <span style={styles.snapshotChip} className="snapshot-chip-text">Vista dinámica</span>
+                  <h2 style={styles.cardTitle}>Filtro por categoría</h2>
+                  <span style={styles.snapshotChip}>Vista dinámica</span>
                 </div>
 
                 <label style={styles.label}>Categoría visible</label>
@@ -821,10 +875,10 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={styles.card} className="surface-card">
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Totales por categoría</h2>
-                  <span style={styles.snapshotChip} className="snapshot-chip-text">{selectedCategoryLabel}</span>
+                  <h2 style={styles.cardTitle}>Totales por categoría</h2>
+                  <span style={styles.snapshotChip}>{selectedCategoryLabel}</span>
                 </div>
 
                 {topCategoryRows.length === 0 ? (
@@ -848,10 +902,10 @@ export default function App() {
               </div>
             </div>
 
-            <div style={chartsGrid} className="charts-grid-main">
-              <div style={styles.card} className="surface-card">
+            <div style={chartsGrid}>
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Variación mes a mes en ARS</h2>
+                  <h2 style={styles.cardTitle}>Variación mes a mes en ARS</h2>
                   <span style={styles.chartLegendPill}>Balance mensual</span>
                 </div>
                 <p style={styles.chartDescription}>
@@ -860,9 +914,9 @@ export default function App() {
                 <BarChart data={chartData} />
               </div>
 
-              <div style={styles.card} className="surface-card">
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Cómo crecen tus dólares</h2>
+                  <h2 style={styles.cardTitle}>Cómo crecen tus dólares</h2>
                   <span style={styles.chartLegendPillBlue}>Ahorro acumulado USD</span>
                 </div>
                 <p style={styles.chartDescription}>
@@ -872,10 +926,10 @@ export default function App() {
               </div>
             </div>
 
-            <div style={categoryAnalyticsGrid} className="category-analytics-grid">
-              <div style={styles.card} className="surface-card">
+            <div style={categoryAnalyticsGrid}>
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Gastos por categoría</h2>
+                  <h2 style={styles.cardTitle}>Gastos por categoría</h2>
                   <span style={styles.chartLegendPillBlue}>ARS anual</span>
                 </div>
                 <p style={styles.chartDescription}>
@@ -884,10 +938,10 @@ export default function App() {
                 <CategoryDonutChart data={topCategoryRows} />
               </div>
 
-              <div style={styles.card} className="surface-card">
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Detalle rápido</h2>
-                  <span style={styles.snapshotChip} className="snapshot-chip-text">{selectedCategoryLabel}</span>
+                  <h2 style={styles.cardTitle}>Detalle rápido</h2>
+                  <span style={styles.snapshotChip}>{selectedCategoryLabel}</span>
                 </div>
 
                 {topCategoryRows.length === 0 ? (
@@ -913,10 +967,10 @@ export default function App() {
               </div>
             </div>
 
-            <div style={styles.card} className="surface-card">
+            <div style={styles.card}>
               <div style={styles.cardTopRow}>
-                <h2 style={styles.cardTitle} className="card-title-text">Resumen por mes</h2>
-                <span style={styles.snapshotChip} className="snapshot-chip-text">Vista anual</span>
+                <h2 style={styles.cardTitle}>Resumen por mes</h2>
+                <span style={styles.snapshotChip}>Vista anual</span>
               </div>
               <div style={styles.tableWrap}>
                 <table style={styles.table}>
@@ -953,9 +1007,9 @@ export default function App() {
             </div>
           </>
         ) : (
-          <div style={monthGrid} className="month-grid-main">
+          <div style={monthGrid}>
             <div>
-              <div style={monthMetaGrid} className="month-meta-grid">
+              <div style={monthMetaGrid}>
                 <InfoCard title="Movimientos" value={`${selectedSummary.movimientos}`} subtitle="Total cargado en el mes" compact />
                 <InfoCard title="Ingresos visibles" value={`${filteredIngresos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
                 <InfoCard title="Gastos visibles" value={`${filteredGastos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
@@ -983,9 +1037,9 @@ export default function App() {
             </div>
 
             <div>
-              <div style={styles.card} className="surface-card">
+              <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle} className="card-title-text">Resumen de {selectedMonthName}</h2>
+                  <h2 style={styles.cardTitle}>Resumen de {selectedMonthName}</h2>
                   <span
                     style={{
                       ...styles.snapshotChip,
@@ -1010,8 +1064,8 @@ export default function App() {
 
               <div style={{ height: 18 }} />
 
-              <div style={styles.card} className="surface-card">
-                <h2 style={styles.cardTitle} className="card-title-text">Ahorro inicial</h2>
+              <div style={styles.card}>
+                <h2 style={styles.cardTitle}>Ahorro inicial</h2>
                 <p style={styles.note}>
                   Esto impacta de verdad en enero. Después, cada mes arrastra el ahorro del anterior.
                 </p>
@@ -1049,11 +1103,10 @@ export default function App() {
 
 function LoadingScreen({ message }) {
   return (
-    <div style={styles.authPage} className="auth-page-root">
-      <ResponsiveStyles />
+    <div style={styles.authPage}>
       <div style={{ ...styles.authCard, ...styles.loadingCard }}>
         <div style={styles.loadingSpinner} />
-        <h2 style={styles.authTitle} className="auth-title-text">{message}</h2>
+        <h2 style={styles.authTitle}>{message}</h2>
       </div>
     </div>
   );
@@ -1070,7 +1123,12 @@ function AuthScreen({
   authLoading,
   authError,
   authInfo,
+  windowWidth,
 }) {
+  const authTabsStyle = {
+    ...styles.authTabs,
+    gridTemplateColumns: windowWidth < 720 ? "1fr" : "repeat(3, minmax(0, 1fr))",
+  };
   const submitAction =
     authView === "register"
       ? handleRegister
@@ -1086,51 +1144,22 @@ function AuthScreen({
   };
 
   return (
-    <div style={styles.authPage} className="auth-page-root">
-      <ResponsiveStyles />
+    <div style={styles.authPage}>
       <div style={styles.glowTop} />
       <div style={styles.glowBottom} />
 
-      <div style={styles.authShell} className="auth-shell-grid">
-        <div style={styles.authAside} className="auth-aside-panel surface-card">
-          <div style={styles.authAsideBadge}>Tu espacio privado</div>
-          <h2 style={styles.authAsideTitle}>Ordená ingresos, gastos y ahorros en un solo lugar.</h2>
-          <p style={styles.authAsideText}>
-            Cada cuenta guarda su propia información. Entrás, elegís el año y seguís tu evolución sin mezclar datos con otros usuarios.
-          </p>
-
-          <div style={styles.authFeatureList}>
-            <div style={styles.authFeatureItem}>
-              <span style={styles.authFeatureDot} />
-              Dashboard con balances, gráficos y seguimiento anual.
-            </div>
-            <div style={styles.authFeatureItem}>
-              <span style={styles.authFeatureDot} />
-              Categorías, filtros y sincronización automática en Firebase.
-            </div>
-            <div style={styles.authFeatureItem}>
-              <span style={styles.authFeatureDot} />
-              Acceso con email y recuperación de contraseña.
-            </div>
-          </div>
-
-          <div style={styles.authTinyNote}>
-            Diseñado para verse bien en monitor, notebook, tablet y celular.
-          </div>
-        </div>
-
-        <div style={styles.authCard} className="auth-card-shell surface-card">
+      <div style={styles.authShell}>
+        <div style={styles.authCard}>
           <div style={styles.authHeader}>
-            <div style={styles.authEyebrow} className="auth-eyebrow-chip">ACCESO SEGURO</div>
-            <h1 style={styles.authTitle} className="auth-title-text">Control de gastos personal</h1>
-            <p style={styles.authSubtitle} className="auth-subtitle-text">
+            <div style={styles.authEyebrow}>ACCESO SEGURO</div>
+            <h1 style={styles.authTitle}>Control de gastos personal</h1>
+            <p style={styles.authSubtitle}>
               Registrate para guardar tu seguimiento y entrar siempre a tu propia información.
             </p>
           </div>
 
-          <div style={styles.authTabs} className="auth-tabs-grid">
+          <div style={authTabsStyle}>
             <button
-              className="auth-tab-btn interactive-btn"
               style={{
                 ...styles.authTab,
                 ...(authView === "login" ? styles.authTabActive : {}),
@@ -1140,7 +1169,6 @@ function AuthScreen({
               Iniciar sesión
             </button>
             <button
-              className="auth-tab-btn interactive-btn"
               style={{
                 ...styles.authTab,
                 ...(authView === "register" ? styles.authTabActive : {}),
@@ -1150,7 +1178,6 @@ function AuthScreen({
               Registrarse
             </button>
             <button
-              className="auth-tab-btn interactive-btn"
               style={{
                 ...styles.authTab,
                 ...(authView === "forgot" ? styles.authTabActive : {}),
@@ -1170,7 +1197,7 @@ function AuthScreen({
             </div>
           ) : null}
 
-          <div style={styles.authFormGrid} className="auth-form-stack" onKeyDown={handleKeyDown}>
+          <div style={styles.authFormGrid} onKeyDown={handleKeyDown}>
             {authView === "register" ? (
               <div>
                 <label style={styles.label}>Nombre</label>
@@ -1221,7 +1248,7 @@ function AuthScreen({
             ) : null}
           </div>
 
-          <button style={styles.authPrimaryButton} className="interactive-btn" onClick={submitAction} disabled={authLoading}>
+          <button style={styles.authPrimaryButton} onClick={submitAction} disabled={authLoading}>
             {authLoading
               ? "Procesando..."
               : authView === "register"
@@ -1234,19 +1261,19 @@ function AuthScreen({
           <div style={styles.authBottomLinks}>
             {authView === "login" ? (
               <>
-                <button style={styles.authLinkButton} className="interactive-btn" onClick={() => setAuthView("register")}>
+                <button style={styles.authLinkButton} onClick={() => setAuthView("register")}>
                   No tengo cuenta
                 </button>
-                <button style={styles.authLinkButton} className="interactive-btn" onClick={() => setAuthView("forgot")}>
+                <button style={styles.authLinkButton} onClick={() => setAuthView("forgot")}>
                   Recuperar contraseña
                 </button>
               </>
             ) : authView === "register" ? (
-              <button style={styles.authLinkButton} className="interactive-btn" onClick={() => setAuthView("login")}>
+              <button style={styles.authLinkButton} onClick={() => setAuthView("login")}>
                 Ya tengo cuenta
               </button>
             ) : (
-              <button style={styles.authLinkButton} className="interactive-btn" onClick={() => setAuthView("login")}>
+              <button style={styles.authLinkButton} onClick={() => setAuthView("login")}>
                 Volver al login
               </button>
             )}
@@ -1308,12 +1335,12 @@ function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
   };
 
   return (
-    <div style={styles.card} className="surface-card">
+    <div style={styles.card}>
       <div style={styles.sectionHeader}>
-        <h2 style={styles.cardTitle} className="card-title-text">{title}</h2>
+        <h2 style={styles.cardTitle}>{title}</h2>
       </div>
 
-      <div style={styles.quickEntryBox} className="quick-entry-grid">
+      <div style={styles.quickEntryBox}>
         <input
           style={{ ...styles.input, ...styles.quickInputText }}
           value={draft.descripcion}
@@ -1367,17 +1394,17 @@ function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
         </div>
       ) : (
         entries.map((entry) => (
-          <div key={entry.id} style={styles.simpleRow} className="simple-row-item">
-            <div style={styles.simpleRowLeft} className="simple-row-left">
+          <div key={entry.id} style={styles.simpleRow}>
+            <div style={styles.simpleRowLeft}>
               <span style={styles.simpleRowLabel}>{entry.descripcion}</span>
               <div style={styles.categoryBadge}>{entry.categoria || DEFAULT_CATEGORY}</div>
             </div>
 
-            <div style={styles.simpleRowRight} className="simple-row-right">
+            <div style={styles.simpleRowRight}>
               <span style={styles.simpleRowAmount}>
                 {entry.moneda === "ARS" ? "$" : "US$"} {entry.moneda === "ARS" ? formatARS(entry.monto) : formatUSD(entry.monto)}
               </span>
-              <button style={styles.deleteSquareButton} className="interactive-btn" onClick={() => onDelete(entry.id)}>
+              <button style={styles.deleteSquareButton} onClick={() => onDelete(entry.id)}>
                 🗑
               </button>
             </div>
@@ -1390,7 +1417,7 @@ function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
 
 function StatCard({ title, value, accent }) {
   return (
-    <div style={{ ...styles.card, ...styles.statCard }} className="surface-card">
+    <div style={{ ...styles.card, ...styles.statCard }}>
       <div style={{ ...styles.statAccent, background: accent }} />
       <div style={styles.statTitle}>{title}</div>
       <div style={styles.statValue}>{value}</div>
@@ -1417,7 +1444,7 @@ function MiniPanel({ title, mainValue, secondary, tone }) {
 
 function InfoCard({ title, value, subtitle, compact }) {
   return (
-    <div style={{ ...styles.card, ...(compact ? styles.infoCardCompact : styles.infoCard) }} className="surface-card">
+    <div style={{ ...styles.card, ...(compact ? styles.infoCardCompact : styles.infoCard) }}>
       <div style={styles.infoCardTitle}>{title}</div>
       <div style={styles.infoCardValue}>{value}</div>
       <div style={styles.infoCardSubtitle}>{subtitle}</div>
@@ -1464,8 +1491,8 @@ function LineChart({ data }) {
     .join(" ");
 
   return (
-    <div style={styles.chartWrap} className="chart-card">
-      <svg viewBox={`0 0 ${width} ${height}`} style={styles.chartSvg} className="chart-svg-element">
+    <div style={styles.chartWrap}>
+      <svg viewBox={`0 0 ${width} ${height}`} style={styles.chartSvg}>
         {[0, 1, 2, 3].map((step) => {
           const y = paddingY + (step * (height - paddingY * 2)) / 3;
           return <line key={step} x1={paddingX} x2={width - paddingX} y1={y} y2={y} stroke="rgba(120, 151, 196, 0.18)" strokeWidth="1" />;
@@ -1512,8 +1539,8 @@ function BarChart({ data }) {
   const barWidth = innerWidth / Math.max(data.length, 1) - 10;
 
   return (
-    <div style={styles.chartWrap} className="chart-card">
-      <svg viewBox={`0 0 ${width} ${height}`} style={styles.chartSvg} className="chart-svg-element">
+    <div style={styles.chartWrap}>
+      <svg viewBox={`0 0 ${width} ${height}`} style={styles.chartSvg}>
         <line x1={paddingX} x2={width - paddingX} y1={zeroY} y2={zeroY} stroke="rgba(148, 169, 205, 0.35)" strokeWidth="1.5" />
 
         {data.map((item, index) => {
@@ -1555,7 +1582,7 @@ function CategoryDonutChart({ data }) {
   let offset = 0;
 
   return (
-    <div style={styles.donutWrap} className="donut-chart-wrap">
+    <div style={styles.donutWrap}>
       <svg viewBox={`0 0 ${size} ${size}`} style={styles.donutSvg}>
         <circle
           cx={size / 2}
@@ -1618,207 +1645,6 @@ const CATEGORY_COLORS = [
   "#9bd7ff",
 ];
 
-function ResponsiveStyles() {
-  return (
-    <style>{`
-      * { box-sizing: border-box; }
-      html { -webkit-text-size-adjust: 100%; }
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      .app-page-root input,
-      .app-page-root select,
-      .app-page-root button,
-      .auth-page-root input,
-      .auth-page-root select,
-      .auth-page-root button {
-        font: inherit;
-      }
-      .app-tabs, .auth-tabs-grid {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(114, 195, 255, 0.32) transparent;
-      }
-      .app-tabs::-webkit-scrollbar, .auth-tabs-grid::-webkit-scrollbar {
-        height: 6px;
-      }
-      .app-tabs::-webkit-scrollbar-thumb, .auth-tabs-grid::-webkit-scrollbar-thumb {
-        background: rgba(114, 195, 255, 0.28);
-        border-radius: 999px;
-      }
-      .app-page-root input:focus,
-      .app-page-root select:focus,
-      .auth-page-root input:focus,
-      .auth-page-root select:focus {
-        border-color: rgba(114, 195, 255, 0.92) !important;
-        box-shadow: 0 0 0 3px rgba(114, 195, 255, 0.14);
-      }
-      @media (hover: hover) {
-        .interactive-btn:hover {
-          transform: translateY(-1px);
-          filter: brightness(1.03);
-        }
-        .surface-card:hover {
-          box-shadow: 0 22px 54px rgba(0,0,0,0.26);
-          border-color: rgba(88, 126, 183, 0.55);
-        }
-      }
-      @media (max-width: 1200px) {
-        .app-header {
-          align-items: flex-start !important;
-        }
-        .app-header-right {
-          width: 100% !important;
-          justify-content: flex-start !important;
-        }
-        .dashboard-grid-main,
-        .dashboard-filter-grid,
-        .category-analytics-grid {
-          grid-template-columns: 1fr !important;
-        }
-      }
-      @media (max-width: 1024px) {
-        .app-page-root, .auth-page-root {
-          padding: 20px !important;
-        }
-        .app-title-text {
-          font-size: 32px !important;
-        }
-        .auth-title-text {
-          font-size: 28px !important;
-        }
-        .auth-shell-grid {
-          grid-template-columns: 1fr !important;
-          min-height: auto !important;
-        }
-        .auth-aside-panel {
-          display: none !important;
-        }
-      }
-      @media (max-width: 820px) {
-        .app-tabs {
-          flex-wrap: nowrap !important;
-          overflow-x: auto !important;
-          padding-bottom: 8px !important;
-        }
-        .app-tabs > button {
-          flex: 0 0 auto !important;
-          white-space: nowrap !important;
-        }
-        .summary-cards-grid,
-        .stats-grid-main,
-        .month-meta-grid,
-        .dashboard-filter-grid,
-        .charts-grid-main,
-        .month-grid-main {
-          grid-template-columns: 1fr !important;
-        }
-        .quick-entry-grid {
-          grid-template-columns: 1fr 1fr !important;
-        }
-        .quick-entry-grid > *:nth-child(3),
-        .quick-entry-grid > *:nth-child(4) {
-          grid-column: span 1 !important;
-        }
-        .simple-row-item {
-          align-items: flex-start !important;
-        }
-        .chart-svg-element {
-          height: 220px !important;
-        }
-      }
-      @media (max-width: 620px) {
-        .app-page-root, .auth-page-root {
-          padding: 14px !important;
-        }
-        .app-title-text {
-          font-size: 28px !important;
-        }
-        .app-subtitle-text, .auth-subtitle-text {
-          font-size: 14px !important;
-        }
-        .hero-value {
-          font-size: 34px !important;
-        }
-        .auth-title-text {
-          font-size: 24px !important;
-        }
-        .auth-card-shell, .surface-card {
-          padding: 16px !important;
-          border-radius: 20px !important;
-        }
-        .auth-tabs-grid,
-        .summary-cards-grid,
-        .stats-grid-main,
-        .month-meta-grid {
-          grid-template-columns: 1fr !important;
-        }
-        .quick-entry-grid {
-          grid-template-columns: 1fr !important;
-        }
-        .app-header-right {
-          display: grid !important;
-          grid-template-columns: 1fr !important;
-          width: 100% !important;
-        }
-        .user-card-box, .status-chip, .year-box-card, .logout-btn {
-          width: 100% !important;
-        }
-        .logout-btn {
-          min-height: 48px !important;
-        }
-        .simple-row-item {
-          flex-direction: column !important;
-          align-items: stretch !important;
-        }
-        .simple-row-left, .simple-row-right {
-          width: 100% !important;
-        }
-        .simple-row-right {
-          justify-content: space-between !important;
-        }
-        .auth-tabs-grid {
-          overflow-x: auto !important;
-          grid-template-columns: 1fr !important;
-        }
-        .chart-svg-element {
-          height: 200px !important;
-        }
-        .donut-chart-wrap {
-          max-width: 250px !important;
-        }
-      }
-      @media (max-width: 420px) {
-        .app-title-text {
-          font-size: 24px !important;
-        }
-        .hero-value {
-          font-size: 29px !important;
-        }
-        .auth-title-text {
-          font-size: 22px !important;
-        }
-        .tab-btn, .auth-tab-btn {
-          padding: 10px 12px !important;
-          font-size: 12px !important;
-        }
-        .snapshot-chip-text, .status-chip, .auth-eyebrow-chip {
-          font-size: 12px !important;
-        }
-        .simple-row-item {
-          padding: 10px 12px !important;
-        }
-        .card-title-text {
-          font-size: 19px !important;
-        }
-        .chart-svg-element {
-          height: 180px !important;
-        }
-      }
-    `}</style>
-  );
-}
-
 const styles = {
 
   authPage: {
@@ -1826,88 +1652,20 @@ const styles = {
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: 28,
+    padding: 24,
     boxSizing: "border-box",
     position: "relative",
     overflow: "hidden",
   },
   authShell: {
     minHeight: "calc(100vh - 48px)",
-    display: "grid",
-    gridTemplateColumns: "1.05fr 0.95fr",
-    alignItems: "stretch",
+    display: "flex",
+    alignItems: "center",
     justifyContent: "center",
-    gap: 20,
     position: "relative",
     zIndex: 1,
-  },
-  authAside: {
     width: "100%",
-    maxWidth: 560,
-    background: "linear-gradient(160deg, rgba(16, 32, 58, 0.92) 0%, rgba(10, 20, 36, 0.88) 100%)",
-    border: "1px solid rgba(77, 116, 176, 0.34)",
-    borderRadius: 28,
-    padding: 28,
-    boxSizing: "border-box",
-    boxShadow: "0 22px 56px rgba(0,0,0,0.24)",
-    backdropFilter: "blur(12px)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  authAsideBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    padding: "7px 12px",
-    borderRadius: 999,
-    background: "rgba(78, 240, 168, 0.10)",
-    border: "1px solid rgba(78, 240, 168, 0.22)",
-    color: "#8cf1c6",
-    fontWeight: 800,
-    fontSize: 12,
-    marginBottom: 18,
-  },
-  authAsideTitle: {
-    margin: 0,
-    fontSize: 38,
-    lineHeight: 1.08,
-    letterSpacing: -0.8,
-  },
-  authAsideText: {
-    margin: "14px 0 0 0",
-    color: "#a7b9d8",
-    lineHeight: 1.65,
-    fontSize: 15,
-  },
-  authFeatureList: {
-    display: "grid",
-    gap: 12,
-    marginTop: 24,
-  },
-  authFeatureItem: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 10,
-    padding: "12px 14px",
-    borderRadius: 16,
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(81, 104, 142, 0.22)",
-    color: "#dde7f7",
-    lineHeight: 1.5,
-  },
-  authFeatureDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-    background: "linear-gradient(180deg, #72c3ff 0%, #4ef0a8 100%)",
-    marginTop: 6,
-    flexShrink: 0,
-  },
-  authTinyNote: {
-    marginTop: 22,
-    color: "#8ea5cb",
-    fontSize: 13,
+    padding: "20px 0",
   },
   authCard: {
     width: "100%",
@@ -1915,7 +1673,7 @@ const styles = {
     background: "rgba(14, 24, 40, 0.88)",
     border: "1px solid rgba(61, 89, 130, 0.42)",
     borderRadius: 28,
-    padding: 28,
+    padding: 24,
     boxSizing: "border-box",
     boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
     backdropFilter: "blur(12px)",
@@ -1950,9 +1708,8 @@ const styles = {
   },
   authTitle: {
     margin: 0,
-    fontSize: 34,
-    lineHeight: 1.08,
-    letterSpacing: -0.6,
+    fontSize: 32,
+    lineHeight: 1.1,
   },
   authSubtitle: {
     margin: "10px 0 0 0",
@@ -2015,14 +1772,13 @@ const styles = {
     width: "100%",
     border: "none",
     borderRadius: 14,
-    padding: "15px 16px",
+    padding: "14px 16px",
     background: "linear-gradient(180deg, #72c3ff 0%, #3b8fe8 100%)",
     color: "#06111f",
     fontWeight: 800,
     cursor: "pointer",
     fontSize: 15,
     marginBottom: 14,
-    boxShadow: "0 12px 30px rgba(59, 143, 232, 0.24)",
   },
   authBottomLinks: {
     display: "flex",
@@ -2038,8 +1794,8 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 48,
-    padding: "8px 12px",
+    minHeight: 78,
+    padding: "12px 14px",
     borderRadius: 14,
     background: "rgba(112, 195, 255, 0.10)",
     border: "1px solid rgba(112, 195, 255, 0.22)",
@@ -2058,7 +1814,7 @@ const styles = {
     marginTop: 3,
   },
   logoutButton: {
-    minHeight: 48,
+    minHeight: 78,
     border: "none",
     borderRadius: 14,
     padding: "0 16px",
@@ -2102,7 +1858,8 @@ const styles = {
     pointerEvents: "none",
   },
   container: {
-    maxWidth: 1460,
+    width: "100%",
+    maxWidth: 1560,
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
@@ -2111,7 +1868,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 16,
+    gap: 20,
     flexWrap: "wrap",
     marginBottom: 24,
   },
@@ -2120,20 +1877,24 @@ const styles = {
     alignItems: "center",
     gap: 12,
     flexWrap: "wrap",
+    justifyContent: "flex-end",
   },
   title: {
     margin: 0,
-    fontSize: 42,
-    lineHeight: 1.02,
-    letterSpacing: -0.9,
+    fontSize: 52,
+    lineHeight: 1.03,
+    letterSpacing: "-0.03em",
   },
   subtitle: {
-    margin: "10px 0 0 0",
+    margin: "12px 0 0 0",
     color: "#9cb0d1",
-    maxWidth: 720,
+    maxWidth: 760,
+    lineHeight: 1.5,
+    fontSize: 18,
   },
   yearBox: {
-    minWidth: 170,
+    minWidth: 160,
+    minHeight: 78,
     background: "rgba(10, 18, 34, 0.7)",
     border: "1px solid rgba(72, 100, 145, 0.35)",
     borderRadius: 18,
@@ -2145,7 +1906,7 @@ const styles = {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 48,
+    minHeight: 78,
     padding: "0 14px",
     borderRadius: 14,
     background: "rgba(78, 240, 168, 0.10)",
@@ -2194,18 +1955,20 @@ const styles = {
   },
   tabsWrap: {
     display: "flex",
-    flexWrap: "wrap",
     gap: 10,
     marginBottom: 24,
+    scrollbarWidth: "thin",
   },
   tab: {
     background: "rgba(17, 29, 49, 0.78)",
     color: "#d8e4ff",
     border: "1px solid rgba(56, 82, 120, 0.85)",
-    borderRadius: 12,
-    padding: "11px 15px",
+    borderRadius: 14,
+    padding: "12px 18px",
     cursor: "pointer",
     backdropFilter: "blur(8px)",
+    whiteSpace: "nowrap",
+    flexShrink: 0,
   },
   activeTab: {
     background: "linear-gradient(180deg, rgba(35, 65, 103, 0.96) 0%, rgba(25, 47, 77, 0.96) 100%)",
@@ -2224,14 +1987,14 @@ const styles = {
   card: {
     background: "rgba(14, 24, 40, 0.80)",
     border: "1px solid rgba(61, 89, 130, 0.42)",
-    borderRadius: 26,
+    borderRadius: 24,
     padding: 20,
     boxSizing: "border-box",
     boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
     backdropFilter: "blur(12px)",
   },
   heroCard: {
-    padding: 24,
+    padding: 22,
     background: "linear-gradient(145deg, rgba(18, 34, 58, 0.92) 0%, rgba(11, 22, 39, 0.92) 100%)",
   },
   monthSnapshotCard: {
@@ -2250,12 +2013,12 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 46,
+    fontSize: 58,
     fontWeight: 800,
     letterSpacing: -1,
   },
   heroBadge: {
-    padding: "11px 15px",
+    padding: "10px 14px",
     borderRadius: 999,
     color: "#f8de7d",
     background: "rgba(247, 215, 109, 0.10)",
@@ -2500,7 +2263,7 @@ const styles = {
   },
   quickEntryBox: {
     display: "grid",
-    gridTemplateColumns: "minmax(180px, 2fr) minmax(120px, 1fr) 110px minmax(170px, 1.1fr)",
+    gridTemplateColumns: "minmax(220px, 2fr) minmax(140px, 1fr) 110px minmax(180px, 1.2fr)",
     gap: 10,
     marginBottom: 10,
   },
