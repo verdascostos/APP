@@ -114,61 +114,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const styleId = "budget-layout-reset";
-    let styleTag = document.getElementById(styleId);
-    const createdNow = !styleTag;
-    const previousContent = styleTag?.textContent || "";
-
-    if (!styleTag) {
-      styleTag = document.createElement("style");
-      styleTag.id = styleId;
-      document.head.appendChild(styleTag);
-    }
-
-    styleTag.textContent = `
-      *, *::before, *::after {
-        box-sizing: border-box;
-      }
-
-      html, body {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        min-height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-      }
-
-      body {
-        display: block;
-        overflow-y: auto;
-      }
-
-      #root {
-        width: 100%;
-        max-width: none !important;
-        min-width: 0;
-        min-height: 100vh;
-        margin: 0;
-        padding: 0;
-        display: block;
-        overflow: visible;
-        text-align: left;
-      }
-    `;
-
-    return () => {
-      if (!styleTag) return;
-      if (createdNow) {
-        styleTag.remove();
-      } else {
-        styleTag.textContent = previousContent;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -1780,7 +1725,7 @@ const styles = {
     overflowX: "hidden",
   },
   authShell: {
-    minHeight: "calc(100vh - 48px)",
+    minHeight: "calc(100dvh - 48px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
