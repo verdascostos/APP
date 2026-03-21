@@ -82,6 +82,7 @@ export default function App() {
   const [loadedYear, setLoadedYear] = useState(null);
   const [cloudStatus, setCloudStatus] = useState("Conectando...");
   const [cloudError, setCloudError] = useState("");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("todas");
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -223,6 +224,14 @@ export default function App() {
   const monthMetaGrid = {
     ...styles.monthMetaGrid,
     gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))",
+  };
+  const categoryAnalyticsGrid = {
+    ...styles.categoryAnalyticsGrid,
+    gridTemplateColumns: isMobile ? "1fr" : "1fr 1.2fr",
+  };
+  const dashboardFilterGrid = {
+    ...styles.dashboardFilterGrid,
+    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
   };
 
   const updateMonth = (month, updater) => {
@@ -398,6 +407,62 @@ export default function App() {
     }));
   }, [monthSummary]);
 
+  const categoryExpenseTotals = useMemo(() => {
+    const base = CATEGORIES.reduce((acc, category) => {
+      acc[category] = { category, ars: 0, usd: 0, count: 0 };
+      return acc;
+    }, {});
+
+    MONTHS.forEach((month) => {
+      const monthData = data[month] || emptyMonth();
+      monthData.gastos.forEach((item) => {
+        const category = item.categoria || "otro";
+        if (!base[category]) {
+          base[category] = { category, ars: 0, usd: 0, count: 0 };
+        }
+
+        if (item.moneda === "USD") {
+          base[category].usd += Number(item.monto) || 0;
+        } else {
+          base[category].ars += Number(item.monto) || 0;
+        }
+
+        base[category].count += 1;
+      });
+    });
+
+    return Object.values(base).sort((a, b) => {
+      if (b.ars !== a.ars) return b.ars - a.ars;
+      if (b.usd !== a.usd) return b.usd - a.usd;
+      return b.count - a.count;
+    });
+  }, [data]);
+
+  const visibleCategoryRows = useMemo(() => {
+    const rows = selectedCategoryFilter === "todas"
+      ? categoryExpenseTotals
+      : categoryExpenseTotals.filter((row) => row.category === selectedCategoryFilter);
+
+    return rows.filter((row) => row.ars > 0 || row.usd > 0 || row.count > 0);
+  }, [categoryExpenseTotals, selectedCategoryFilter]);
+
+  const selectedCategorySummary = useMemo(() => {
+    return visibleCategoryRows.reduce(
+      (acc, row) => {
+        acc.ars += row.ars;
+        acc.usd += row.usd;
+        acc.count += row.count;
+        return acc;
+      },
+      { ars: 0, usd: 0, count: 0 }
+    );
+  }, [visibleCategoryRows]);
+
+  const topCategoryRows = useMemo(() => visibleCategoryRows.slice(0, 6), [visibleCategoryRows]);
+
+  const selectedCategoryLabel =
+    selectedCategoryFilter === "todas" ? "todas las categorías" : selectedCategoryFilter;
+
   const selectedMonthName = activeTab === "Dashboard" ? currentMonth : activeTab;
   const selectedMonth = data[selectedMonthName] || emptyMonth();
   const selectedSummary = monthSummary[selectedMonthName] || {
@@ -415,6 +480,16 @@ export default function App() {
     cantidadIngresos: 0,
     cantidadGastos: 0,
   };
+
+  const filteredIngresos = useMemo(() => {
+    if (selectedCategoryFilter === "todas") return selectedMonth.ingresos;
+    return selectedMonth.ingresos.filter((entry) => (entry.categoria || "otro") === selectedCategoryFilter);
+  }, [selectedMonth.ingresos, selectedCategoryFilter]);
+
+  const filteredGastos = useMemo(() => {
+    if (selectedCategoryFilter === "todas") return selectedMonth.gastos;
+    return selectedMonth.gastos.filter((entry) => (entry.categoria || "otro") === selectedCategoryFilter);
+  }, [selectedMonth.gastos, selectedCategoryFilter]);
 
   return (
     <div style={styles.page}>
@@ -549,6 +624,61 @@ export default function App() {
               <InfoCard title="Movimientos cargados" value={`${totals.movimientos}`} subtitle="Ingresos + gastos registrados" />
             </div>
 
+            <div style={dashboardFilterGrid}>
+              <div style={styles.card}>
+                <div style={styles.cardTopRow}>
+                  <h2 style={styles.cardTitle}>Filtro por categoría</h2>
+                  <span style={styles.snapshotChip}>Vista dinámica</span>
+                </div>
+
+                <label style={styles.label}>Categoría visible</label>
+                <select
+                  style={styles.input}
+                  value={selectedCategoryFilter}
+                  onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                >
+                  <option value="todas">todas</option>
+                  {CATEGORIES.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+
+                <div style={{ marginTop: 16 }}>
+                  <SummaryRow label="Gastos ARS filtrados" value={`$ ${formatARS(selectedCategorySummary.ars)}`} strongTone="#ff8c99" />
+                  <SummaryRow label="Gastos USD filtrados" value={`US$ ${formatUSD(selectedCategorySummary.usd)}`} strongTone="#89d5ff" />
+                  <SummaryRow label="Movimientos filtrados" value={`${selectedCategorySummary.count}`} />
+                </div>
+              </div>
+
+              <div style={styles.card}>
+                <div style={styles.cardTopRow}>
+                  <h2 style={styles.cardTitle}>Totales por categoría</h2>
+                  <span style={styles.snapshotChip}>{selectedCategoryLabel}</span>
+                </div>
+
+                {topCategoryRows.length === 0 ? (
+                  <div style={styles.emptyBox}>Todavía no hay gastos cargados para esa categoría.</div>
+                ) : (
+                  <div style={styles.categoryList}>
+                    {topCategoryRows.map((row) => (
+                      <div key={row.category} style={styles.categoryRow}>
+                        <div style={styles.categoryRowLeft}>
+                          <span style={styles.categoryName}>{row.category}</span>
+                          <span style={styles.categoryCount}>{row.count} mov.</span>
+                        </div>
+                        <div style={styles.categoryRowRight}>
+                          <span style={styles.categoryValueARS}>$ {formatARS(row.ars)}</span>
+                          <span style={styles.categoryValueUSD}>US$ {formatUSD(row.usd)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div style={chartsGrid}>
               <div style={styles.card}>
                 <div style={styles.cardTopRow}>
@@ -570,6 +700,47 @@ export default function App() {
                   Acá ves si tus dólares vienen creciendo de forma sostenida o si hubo meses de retroceso.
                 </p>
                 <LineChart data={chartData} />
+              </div>
+            </div>
+
+            <div style={categoryAnalyticsGrid}>
+              <div style={styles.card}>
+                <div style={styles.cardTopRow}>
+                  <h2 style={styles.cardTitle}>Gastos por categoría</h2>
+                  <span style={styles.chartLegendPillBlue}>ARS anual</span>
+                </div>
+                <p style={styles.chartDescription}>
+                  El gráfico toma los gastos acumulados en pesos por categoría del año seleccionado.
+                </p>
+                <CategoryDonutChart data={topCategoryRows} />
+              </div>
+
+              <div style={styles.card}>
+                <div style={styles.cardTopRow}>
+                  <h2 style={styles.cardTitle}>Detalle rápido</h2>
+                  <span style={styles.snapshotChip}>{selectedCategoryLabel}</span>
+                </div>
+
+                {topCategoryRows.length === 0 ? (
+                  <div style={styles.emptyBox}>No hay datos suficientes para mostrar el gráfico.</div>
+                ) : (
+                  <div style={styles.categoryLegendList}>
+                    {topCategoryRows.map((row, index) => (
+                      <div key={row.category} style={styles.categoryLegendRow}>
+                        <div style={styles.categoryLegendLeft}>
+                          <span
+                            style={{
+                              ...styles.legendDot,
+                              background: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+                            }}
+                          />
+                          <span style={styles.categoryLegendName}>{row.category}</span>
+                        </div>
+                        <strong style={styles.categoryLegendValue}>$ {formatARS(row.ars)}</strong>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -617,15 +788,16 @@ export default function App() {
             <div>
               <div style={monthMetaGrid}>
                 <InfoCard title="Movimientos" value={`${selectedSummary.movimientos}`} subtitle="Total cargado en el mes" compact />
-                <InfoCard title="Ingresos cargados" value={`${selectedSummary.cantidadIngresos}`} subtitle="Entradas registradas" compact />
-                <InfoCard title="Gastos cargados" value={`${selectedSummary.cantidadGastos}`} subtitle="Salidas registradas" compact />
+                <InfoCard title="Ingresos visibles" value={`${filteredIngresos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
+                <InfoCard title="Gastos visibles" value={`${filteredGastos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
               </div>
 
               <div style={{ height: 18 }} />
 
               <EntrySection
                 title="Ingresos"
-                entries={selectedMonth.ingresos}
+                entries={filteredIngresos}
+                categoryFilter={selectedCategoryFilter}
                 onAdd={(entry) => addEntry(selectedMonthName, "ingresos", entry)}
                 onDelete={(id) => deleteEntry(selectedMonthName, "ingresos", id)}
               />
@@ -634,7 +806,8 @@ export default function App() {
 
               <EntrySection
                 title="Gastos"
-                entries={selectedMonth.gastos}
+                entries={filteredGastos}
+                categoryFilter={selectedCategoryFilter}
                 onAdd={(entry) => addEntry(selectedMonthName, "gastos", entry)}
                 onDelete={(id) => deleteEntry(selectedMonthName, "gastos", id)}
               />
@@ -704,7 +877,7 @@ export default function App() {
   );
 }
 
-function EntrySection({ title, entries, onAdd, onDelete }) {
+function EntrySection({ title, entries, categoryFilter, onAdd, onDelete }) {
   const [draft, setDraft] = useState({
     descripcion: "",
     monto: "",
@@ -785,7 +958,11 @@ function EntrySection({ title, entries, onAdd, onDelete }) {
       <p style={styles.enterHint}>Escribís motivo, valor y categoría. Apretás Enter y se guarda.</p>
 
       {entries.length === 0 ? (
-        <div style={styles.emptyBox}>Todavía no cargaste nada.</div>
+        <div style={styles.emptyBox}>
+          {categoryFilter === "todas"
+            ? "Todavía no cargaste nada."
+            : `No hay movimientos visibles para ${categoryFilter}.`}
+        </div>
       ) : (
         entries.map((entry) => (
           <div key={entry.id} style={styles.simpleRow}>
@@ -962,6 +1139,60 @@ function BarChart({ data }) {
   );
 }
 
+function CategoryDonutChart({ data }) {
+  const size = 260;
+  const strokeWidth = 28;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const total = data.reduce((acc, item) => acc + item.ars, 0);
+
+  if (!total) {
+    return <div style={styles.emptyBox}>No hay gastos en pesos para graficar todavía.</div>;
+  }
+
+  let offset = 0;
+
+  return (
+    <div style={styles.donutWrap}>
+      <svg viewBox={`0 0 ${size} ${size}`} style={styles.donutSvg}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth={strokeWidth}
+        />
+        {data.map((item, index) => {
+          const value = item.ars;
+          const segment = (value / total) * circumference;
+          const circle = (
+            <circle
+              key={item.category}
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={`${segment} ${circumference - segment}`}
+              strokeDashoffset={-offset}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          );
+          offset += segment;
+          return circle;
+        })}
+      </svg>
+      <div style={styles.donutCenter}>
+        <div style={styles.donutCenterLabel}>Total ARS</div>
+        <div style={styles.donutCenterValue}>$ {formatARS(total)}</div>
+      </div>
+    </div>
+  );
+}
+
 function formatARS(value) {
   return Number(value || 0).toLocaleString("es-AR");
 }
@@ -973,6 +1204,17 @@ function formatUSD(value) {
 function formatPercent(value) {
   return `${Number(value || 0).toFixed(1)}%`;
 }
+
+const CATEGORY_COLORS = [
+  "#72c3ff",
+  "#4ef0a8",
+  "#f7d76d",
+  "#ff7a8c",
+  "#b48bff",
+  "#ffb86b",
+  "#7cf7f2",
+  "#9bd7ff",
+];
 
 const styles = {
   page: {
@@ -1086,6 +1328,16 @@ const styles = {
   monthMetaGrid: {
     display: "grid",
     gap: 12,
+  },
+  categoryAnalyticsGrid: {
+    display: "grid",
+    gap: 18,
+    marginBottom: 18,
+  },
+  dashboardFilterGrid: {
+    display: "grid",
+    gap: 18,
+    marginBottom: 18,
   },
   tabsWrap: {
     display: "flex",
@@ -1286,6 +1538,106 @@ const styles = {
     fontSize: 13,
     color: "#8ea5cb",
     lineHeight: 1.4,
+  },
+  categoryList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  categoryRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+    padding: "10px 12px",
+    borderRadius: 14,
+    border: "1px solid rgba(72, 99, 140, 0.34)",
+    background: "rgba(8, 15, 27, 0.48)",
+  },
+  categoryRowLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
+    minWidth: 0,
+  },
+  categoryRowRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+  },
+  categoryName: {
+    fontWeight: 700,
+    textTransform: "capitalize",
+  },
+  categoryCount: {
+    color: "#8ea5cb",
+    fontSize: 12,
+  },
+  categoryValueARS: {
+    color: "#ff9baa",
+    fontWeight: 700,
+  },
+  categoryValueUSD: {
+    color: "#89d5ff",
+    fontWeight: 700,
+  },
+  categoryLegendList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    marginTop: 6,
+  },
+  categoryLegendRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    padding: "10px 0",
+    borderBottom: "1px solid rgba(61, 89, 130, 0.24)",
+  },
+  categoryLegendLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+  },
+  categoryLegendName: {
+    textTransform: "capitalize",
+  },
+  categoryLegendValue: {
+    color: "#e8eef9",
+  },
+  donutWrap: {
+    position: "relative",
+    width: "100%",
+    maxWidth: 320,
+    margin: "0 auto",
+  },
+  donutSvg: {
+    width: "100%",
+    height: "auto",
+    display: "block",
+  },
+  donutCenter: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+    pointerEvents: "none",
+  },
+  donutCenterLabel: {
+    fontSize: 12,
+    color: "#8ea5cb",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  donutCenterValue: {
+    fontSize: 24,
+    fontWeight: 800,
   },
   emptyBox: {
     border: "1px dashed #385173",
