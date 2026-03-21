@@ -343,31 +343,34 @@ export default function App() {
 
   const headerStyle = {
     ...styles.header,
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(320px, 0.95fr) minmax(0, 1.25fr)",
-    alignItems: isTablet ? "stretch" : "end",
+    gridTemplateColumns: "1fr",
+    alignItems: "stretch",
   };
 
   const headerRightStyle = {
     ...styles.headerRight,
-    width: isTablet ? "100%" : "minmax(720px, 58%)",
+    width: "100%",
     gridTemplateColumns: isTinyPhone
       ? "1fr"
       : isPhone
-      ? "1fr"
+      ? "repeat(2, minmax(0, 1fr))"
       : isTablet
-      ? "minmax(0, 1.2fr) minmax(0, 1fr)"
-      : "minmax(260px, 1.25fr) minmax(290px, 0.95fr) minmax(180px, 0.75fr)",
+      ? "repeat(2, minmax(0, 1fr))"
+      : "minmax(260px, 1.35fr) minmax(330px, 1.1fr) minmax(180px, 0.9fr)",
     alignItems: "stretch",
   };
 
   const titleStyle = {
     ...styles.title,
-    fontSize: isTinyPhone ? 34 : isPhone ? 40 : 52,
+    fontSize: isTinyPhone ? 34 : isPhone ? 40 : isTablet ? 46 : 58,
+    textAlign: isTablet ? "left" : "left",
+    maxWidth: isTablet ? "100%" : 980,
   };
 
   const subtitleStyle = {
     ...styles.subtitle,
-    maxWidth: isTablet ? "100%" : 920,
+    maxWidth: isTablet ? "100%" : 980,
+    textAlign: "left",
   };
 
   const tabsWrapStyle = {
@@ -1834,6 +1837,7 @@ const styles = {
   },
   logoutButton: {
     minHeight: 96,
+    width: "100%",
     borderRadius: 18,
     padding: "0 20px",
     background: "linear-gradient(180deg, rgba(255, 122, 140, 0.16) 0%, rgba(134, 50, 66, 0.16) 100%)",
@@ -1850,7 +1854,7 @@ const styles = {
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: "clamp(12px, 1.6vw, 28px)",
+    padding: "clamp(12px, 1.2vw, 22px)",
     boxSizing: "border-box",
     position: "relative",
     overflow: "hidden",
@@ -1879,28 +1883,30 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: 1780,
+    maxWidth: 1960,
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
   },
   header: {
     display: "grid",
-    gridTemplateColumns: "minmax(320px, 1fr) minmax(640px, 1.2fr)",
-    alignItems: "end",
-    gap: 24,
-    marginBottom: 28,
+    gridTemplateColumns: "1fr",
+    alignItems: "stretch",
+    gap: 18,
+    marginBottom: 24,
   },
   headerRight: {
     display: "grid",
     gap: 14,
     justifyContent: "stretch",
+    width: "100%",
   },
   title: {
     margin: 0,
     fontSize: 52,
     lineHeight: 1.03,
     letterSpacing: "-0.03em",
+    maxWidth: 980,
   },
   subtitle: {
     margin: "12px 0 0 0",
@@ -1912,6 +1918,7 @@ const styles = {
   yearBox: {
     minWidth: 160,
     minHeight: 96,
+    width: "100%",
     background: "rgba(10, 18, 34, 0.7)",
     border: "1px solid rgba(72, 100, 145, 0.35)",
     borderRadius: 18,
@@ -1921,12 +1928,14 @@ const styles = {
   },
   headerControlStack: {
     display: "grid",
-    gridTemplateColumns: "minmax(150px, 0.95fr) minmax(170px, 1fr)",
+    gridTemplateColumns: "minmax(160px, 0.95fr) minmax(170px, 1fr)",
     gap: 14,
     alignItems: "stretch",
+    width: "100%",
   },
   statusCard: {
     minHeight: 96,
+    width: "100%",
     padding: 16,
     borderRadius: 18,
     background: "rgba(12, 31, 42, 0.82)",
@@ -2000,6 +2009,7 @@ const styles = {
     gap: 10,
     marginBottom: 24,
     scrollbarWidth: "thin",
+    width: "100%",
   },
   tab: {
     background: "rgba(17, 29, 49, 0.78)",
