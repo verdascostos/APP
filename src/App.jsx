@@ -1961,9 +1961,8 @@ const styles = {
   },
 
   page: {
-    minHeight: "100vh",
     width: "100%",
-    maxWidth: "100%",
+    minHeight: "100dvh",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
@@ -1971,8 +1970,7 @@ const styles = {
     boxSizing: "border-box",
     position: "relative",
     overflowX: "hidden",
-    overflowY: "visible",
-  },
+  }
   glowTop: {
     position: "absolute",
     width: 420,
