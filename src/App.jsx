@@ -840,6 +840,7 @@ export default function App() {
     selectedCategoryFilter === "Todas" ? "Todas las categorías" : selectedCategoryFilter;
 
   const selectedMonthName = activeTab === "Dashboard" ? currentMonth : activeTab;
+  const isJanuaryTab = selectedMonthName === "Enero";
   const selectedMonth = data[selectedMonthName] || emptyMonth();
   const selectedSummary = monthSummary[selectedMonthName] || {
     ingresosARS: 0,
@@ -1273,47 +1274,55 @@ export default function App() {
                     Balance: $ {formatARS(selectedSummary.balanceARS)}
                   </span>
                 </div>
-                <SummaryRow label="Ahorro inicial ARS" value={`$ ${formatARS(selectedSummary.ahorroBaseARS)}`} />
+                {isJanuaryTab ? (
+                  <SummaryRow label="Ahorro inicial ARS" value={`$ ${formatARS(selectedSummary.ahorroBaseARS)}`} />
+                ) : null}
                 <SummaryRow label="Ingresos ARS" value={`$ ${formatARS(selectedSummary.ingresosARS)}`} />
                 <SummaryRow label="Egresos ARS" value={`$ ${formatARS(selectedSummary.EgresosARS)}`} />
                 <SummaryRow label="Ahorro final ARS" value={`$ ${formatARS(selectedSummary.ahorroFinalARS)}`} strongTone="#6df0bd" />
                 <div style={styles.divider} />
-                <SummaryRow label="Ahorro inicial USD" value={`US$ ${formatUSD(selectedSummary.ahorroBaseUSD)}`} />
+                {isJanuaryTab ? (
+                  <SummaryRow label="Ahorro inicial USD" value={`US$ ${formatUSD(selectedSummary.ahorroBaseUSD)}`} />
+                ) : null}
                 <SummaryRow label="Ingresos USD" value={`US$ ${formatUSD(selectedSummary.ingresosUSD)}`} />
                 <SummaryRow label="Egresos USD" value={`US$ ${formatUSD(selectedSummary.EgresosUSD)}`} />
                 <SummaryRow label="Ahorro final USD" value={`US$ ${formatUSD(selectedSummary.ahorroFinalUSD)}`} strongTone="#89d5ff" />
               </div>
 
-              <div style={{ height: 18 }} />
+              {isJanuaryTab ? (
+                <>
+                  <div style={{ height: 18 }} />
 
-              <div style={styles.card}>
-                <h2 style={styles.cardTitle}>Ahorro inicial</h2>
-                <p style={styles.note}>
-                  Esto impacta de verdad en enero. Después, cada mes arrastra el ahorro del anterior.
-                </p>
+                  <div style={styles.card}>
+                    <h2 style={styles.cardTitle}>Ahorro inicial</h2>
+                    <p style={styles.note}>
+                      Esto impacta de verdad en enero. Después, cada mes arrastra el ahorro del anterior.
+                    </p>
 
-                <label style={styles.label}>Pesos</label>
-                <input
-                  type="number"
-                  style={styles.input}
-                  value={selectedMonth.ahorroInicialARS}
-                  onChange={(e) =>
-                    setInitialSavings(selectedMonthName, "ARS", e.target.value)
-                  }
-                />
+                    <label style={styles.label}>Pesos</label>
+                    <input
+                      type="number"
+                      style={styles.input}
+                      value={selectedMonth.ahorroInicialARS}
+                      onChange={(e) =>
+                        setInitialSavings(selectedMonthName, "ARS", e.target.value)
+                      }
+                    />
 
-                <div style={{ height: 12 }} />
+                    <div style={{ height: 12 }} />
 
-                <label style={styles.label}>Dólares</label>
-                <input
-                  type="number"
-                  style={styles.input}
-                  value={selectedMonth.ahorroInicialUSD}
-                  onChange={(e) =>
-                    setInitialSavings(selectedMonthName, "USD", e.target.value)
-                  }
-                />
-              </div>
+                    <label style={styles.label}>Dólares</label>
+                    <input
+                      type="number"
+                      style={styles.input}
+                      value={selectedMonth.ahorroInicialUSD}
+                      onChange={(e) =>
+                        setInitialSavings(selectedMonthName, "USD", e.target.value)
+                      }
+                    />
+                  </div>
+                </>
+              ) : null}
             </div>
           </div>
         )}
