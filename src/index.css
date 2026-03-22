@@ -59,19 +59,26 @@ body,
 }
 
 html,
+body,
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html,
 body {
   min-height: 100%;
   overflow-x: hidden;
 }
 
 body {
-  min-height: 100dvh;
+  overflow-y: auto;
 }
 
 #root {
   width: 100%;
   max-width: none;
-  min-height: 100dvh;
   margin: 0;
   padding: 0;
   display: block;
