@@ -417,9 +417,13 @@ export default function App() {
   };
 
   const heroBottomStackStyle = {
-    display: "grid",
-    gap: isPhone ? 10 : 12,
-    marginTop: 14,
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    justifyContent: "space-between",
+    gap: isPhone ? 12 : 18,
+    marginTop: 16,
+    minHeight: 0,
   };
 
   const titleStyle = {
@@ -2177,11 +2181,10 @@ const styles = {
     minHeight: 100,
   },
   heroTopRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 16,
-    flexWrap: "wrap",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) auto",
+    alignItems: "start",
+    gap: 18,
   },
   heroLabel: {
     color: "#9cb0d1",
@@ -2189,18 +2192,23 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 60,
+    fontSize: 72,
     fontWeight: 800,
-    letterSpacing: -1.2,
-    lineHeight: 0.95,
+    letterSpacing: -1.6,
+    lineHeight: 0.92,
   },
   heroBadge: {
-    padding: "10px 14px",
+    minWidth: 210,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "14px 18px",
     borderRadius: 999,
     color: "#f8de7d",
     background: "rgba(247, 215, 109, 0.10)",
     border: "1px solid rgba(247, 215, 109, 0.22)",
     fontWeight: 700,
+    fontSize: 18,
   },
   progressBlock: {
     marginTop: 0,
