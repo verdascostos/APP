@@ -736,6 +736,57 @@ export default function App() {
     });
   }, [data]);
 
+  const categoryNetTotals = useMemo(() => {
+    const base = CATEGORIES.reduce((acc, category) => {
+      acc[category] = { category, ars: 0, usd: 0, count: 0 };
+      return acc;
+    }, {});
+
+    MONTHS.forEach((month) => {
+      const monthData = data[month] || emptyMonth();
+
+      monthData.ingresos.forEach((item) => {
+        const category = item.categoria || DEFAULT_CATEGORY;
+        if (!base[category]) {
+          base[category] = { category, ars: 0, usd: 0, count: 0 };
+        }
+
+        if (item.moneda === "USD") {
+          base[category].usd += Number(item.monto) || 0;
+        } else {
+          base[category].ars += Number(item.monto) || 0;
+        }
+
+        base[category].count += 1;
+      });
+
+      monthData.gastos.forEach((item) => {
+        const category = item.categoria || DEFAULT_CATEGORY;
+        if (!base[category]) {
+          base[category] = { category, ars: 0, usd: 0, count: 0 };
+        }
+
+        if (item.moneda === "USD") {
+          base[category].usd -= Number(item.monto) || 0;
+        } else {
+          base[category].ars -= Number(item.monto) || 0;
+        }
+
+        base[category].count += 1;
+      });
+    });
+
+    return Object.values(base).sort((a, b) => {
+      const absArsDiff = Math.abs(b.ars) - Math.abs(a.ars);
+      if (absArsDiff !== 0) return absArsDiff;
+
+      const absUsdDiff = Math.abs(b.usd) - Math.abs(a.usd);
+      if (absUsdDiff !== 0) return absUsdDiff;
+
+      return b.count - a.count;
+    });
+  }, [data]);
+
   const visibleCategoryRows = useMemo(() => {
     const rows = selectedCategoryFilter === "Todas"
       ? categoryExpenseTotals
@@ -743,6 +794,14 @@ export default function App() {
 
     return rows.filter((row) => row.ars > 0 || row.usd > 0 || row.count > 0);
   }, [categoryExpenseTotals, selectedCategoryFilter]);
+
+  const visibleCategoryNetRows = useMemo(() => {
+    const rows = selectedCategoryFilter === "Todas"
+      ? categoryNetTotals
+      : categoryNetTotals.filter((row) => row.category === selectedCategoryFilter);
+
+    return rows.filter((row) => row.ars !== 0 || row.usd !== 0 || row.count > 0);
+  }, [categoryNetTotals, selectedCategoryFilter]);
 
   const selectedCategorySummary = useMemo(() => {
     return visibleCategoryRows.reduce(
@@ -757,6 +816,7 @@ export default function App() {
   }, [visibleCategoryRows]);
 
   const topCategoryRows = useMemo(() => visibleCategoryRows.slice(0, 6), [visibleCategoryRows]);
+  const topCategoryNetRows = useMemo(() => visibleCategoryNetRows.slice(0, 6), [visibleCategoryNetRows]);
 
   const selectedCategoryLabel =
     selectedCategoryFilter === "Todas" ? "Todas las categorías" : selectedCategoryFilter;
@@ -994,19 +1054,33 @@ export default function App() {
                   <span style={styles.snapshotChip}>{selectedCategoryLabel}</span>
                 </div>
 
-                {topCategoryRows.length === 0 ? (
-                  <div style={styles.emptyBox}>Todavía no hay gastos cargados para esa categoría.</div>
+                {topCategoryNetRows.length === 0 ? (
+                  <div style={styles.emptyBox}>Todavía no hay movimientos cargados para esa categoría.</div>
                 ) : (
                   <div style={styles.categoryList}>
-                    {topCategoryRows.map((row) => (
+                    {topCategoryNetRows.map((row) => (
                       <div key={row.category} style={styles.categoryRow}>
                         <div style={styles.categoryRowLeft}>
                           <span style={styles.categoryName}>{row.category}</span>
                           <span style={styles.categoryCount}>{row.count} mov.</span>
                         </div>
                         <div style={styles.categoryRowRight}>
-                          <span style={styles.categoryValueARS}>$ {formatARS(row.ars)}</span>
-                          <span style={styles.categoryValueUSD}>US$ {formatUSD(row.usd)}</span>
+                          <span
+                            style={{
+                              ...styles.categoryValueARS,
+                              color: row.ars > 0 ? "#8cf1c6" : row.ars < 0 ? "#ff9baa" : "#c8d6ef",
+                            }}
+                          >
+                            $ {formatARS(row.ars)}
+                          </span>
+                          <span
+                            style={{
+                              ...styles.categoryValueUSD,
+                              color: row.usd > 0 ? "#89d5ff" : row.usd < 0 ? "#ff9baa" : "#c8d6ef",
+                            }}
+                          >
+                            US$ {formatUSD(row.usd)}
+                          </span>
                         </div>
                       </div>
                     ))}
