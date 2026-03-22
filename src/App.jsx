@@ -440,6 +440,7 @@ export default function App() {
   };
 
   const totalTabs = MONTHS.length + 1;
+  const mobileMonthOptions = ["Dashboard", ...MONTHS];
 
   const tabsWrapStyle = {
     ...styles.tabsWrap,
@@ -453,8 +454,25 @@ export default function App() {
   };
 
   const mobileMonthSelectWrapStyle = {
-    ...styles.mobileMonthSelectWrap,
+    ...styles.yearBox,
+    width: "100%",
+    maxWidth: "100%",
+    minHeight: "auto",
+    padding: 12,
     marginBottom: 24,
+  };
+
+  const mobileMonthSelectStyle = {
+    ...styles.input,
+    minHeight: 48,
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: "rgba(8, 15, 27, 0.88)",
+    border: "1px solid rgba(84, 116, 166, 0.30)",
+    color: "#e8eef9",
+    fontSize: 16,
+    fontWeight: 700,
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
   };
 
   const tabButtonStyle = {
@@ -923,14 +941,13 @@ export default function App() {
           <div style={mobileMonthSelectWrapStyle}>
             <label style={styles.label}>Vista</label>
             <select
-              style={styles.input}
+              style={mobileMonthSelectStyle}
               value={activeTab}
               onChange={(e) => setActiveTab(e.target.value)}
             >
-              <option value="Dashboard">Dashboard</option>
-              {MONTHS.map((month) => (
-                <option key={month} value={month}>
-                  {month}
+              {mobileMonthOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
                 </option>
               ))}
             </select>
@@ -2251,10 +2268,6 @@ const styles = {
     width: "100%",
     alignItems: "center",
     minWidth: 0,
-  },
-  mobileMonthSelectWrap: {
-    width: "100%",
-    maxWidth: "100%",
   },
   tab: {
     background: "rgba(13, 23, 39, 0.62)",
