@@ -811,7 +811,7 @@ export default function App() {
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                 >
-                  {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
+                  {Array.from({ length: 11 }, (_, i) => String(2026 + i)).map((optionYear) => (
                     <option key={optionYear} value={optionYear}>
                       {optionYear}
                     </option>
