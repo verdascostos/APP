@@ -2211,8 +2211,8 @@ const styles = {
     fontSize: 18,
   },
   progressBlock: {
-    marginTop: 0,
-    padding: 26,
+    marginTop: 3,
+    padding: 16,
     borderRadius: 16,
     background: "rgba(9, 18, 30, 0.60)",
     border: "1px solid rgba(73, 102, 143, 0.32)",
