@@ -114,45 +114,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const root = document.getElementById("root");
-    const html = document.documentElement;
-    const body = document.body;
-
-    const previous = {
-      rootMaxWidth: root?.style.maxWidth || "",
-      rootWidth: root?.style.width || "",
-      rootMargin: root?.style.margin || "",
-      rootPadding: root?.style.padding || "",
-      htmlOverflowX: html.style.overflowX || "",
-      bodyOverflowX: body.style.overflowX || "",
-      bodyMargin: body.style.margin || "",
-    };
-
-    if (root) {
-      root.style.maxWidth = "none";
-      root.style.width = "100%";
-      root.style.margin = "0";
-      root.style.padding = "0";
-    }
-
-    html.style.overflowX = "hidden";
-    body.style.overflowX = "hidden";
-    body.style.margin = "0";
-
-    return () => {
-      if (root) {
-        root.style.maxWidth = previous.rootMaxWidth;
-        root.style.width = previous.rootWidth;
-        root.style.margin = previous.rootMargin;
-        root.style.padding = previous.rootPadding;
-      }
-      html.style.overflowX = previous.htmlOverflowX;
-      body.style.overflowX = previous.bodyOverflowX;
-      body.style.margin = previous.bodyMargin;
-    };
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -390,55 +351,79 @@ export default function App() {
   const headerRightStyle = {
     ...styles.headerRight,
     display: "grid",
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(300px, 380px) minmax(0, 1fr)",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(320px, 1fr) auto",
     alignItems: "center",
     width: "100%",
-    gap: isPhone ? 12 : 24,
+    gap: isPhone ? 16 : 22,
     minWidth: 0,
+    padding: isPhone ? 16 : "18px 20px",
+    borderRadius: 28,
+    background: "linear-gradient(180deg, rgba(16, 28, 48, 0.78) 0%, rgba(10, 19, 33, 0.82) 100%)",
+    border: "1px solid rgba(76, 104, 146, 0.24)",
+    boxShadow: "0 20px 44px rgba(0,0,0,0.14)",
+    backdropFilter: "blur(12px)",
   };
 
   const userCardStyle = {
     ...styles.userCard,
     width: "100%",
-    maxWidth: isTablet ? "100%" : 380,
-    flexShrink: 0,
-    justifySelf: "start",
+    maxWidth: "none",
+    minHeight: "auto",
+    padding: isPhone ? 0 : "0 10px 0 8px",
+    borderRadius: 0,
+    background: "transparent",
+    border: "none",
+    boxShadow: "none",
+    justifySelf: "stretch",
   };
 
   const headerControlsGroupStyle = {
     display: "grid",
-    gridTemplateColumns: isPhone ? "1fr" : "minmax(190px, 210px) auto",
-    alignItems: "center",
+    gridTemplateColumns: isTinyPhone
+      ? "1fr"
+      : isPhone
+      ? "minmax(180px, 1fr) auto"
+      : "216px auto auto",
+    alignItems: "end",
     justifyContent: isTablet ? "stretch" : "end",
-    justifySelf: isTablet ? "stretch" : "end",
-    gap: isPhone ? 12 : 18,
-    width: "100%",
+    columnGap: isTinyPhone ? 12 : 16,
+    rowGap: 12,
+    width: isTablet ? "100%" : "auto",
     minWidth: 0,
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
     width: "100%",
+    maxWidth: "100%",
     minWidth: 0,
-    maxWidth: isPhone ? "100%" : 210,
-    minHeight: isPhone ? 76 : 78,
-    padding: isPhone ? 12 : "12px 14px",
+    minHeight: isPhone ? 72 : 76,
+    padding: isPhone ? 12 : "11px 14px",
+  };
+
+  const statusInlineHeaderStyle = {
+    ...styles.statusInline,
+    minWidth: 0,
+    alignItems: "flex-start",
+    justifySelf: "start",
+    alignSelf: "end",
+  };
+
+  const logoutButtonHeaderStyle = {
+    ...styles.logoutButton,
+    alignSelf: "end",
+    justifySelf: isTinyPhone ? "stretch" : "start",
+    width: isTinyPhone ? "100%" : "auto",
   };
 
   const heroBottomStackStyle = {
-    display: "grid",
-    gap: isPhone ? 10 : 12,
-    marginTop: 14,
-  };
-
-  const topBarActionsStyle = {
-    ...styles.topBarActions,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    minHeight: "auto",
-    gap: isPhone ? 10 : 16,
-    flexWrap: isTablet ? "wrap" : "nowrap",
-    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    justifyContent: "space-between",
+    gap: isPhone ? 12 : 18,
+    marginTop: 16,
+    minHeight: 0,
   };
 
   const titleStyle = {
@@ -448,26 +433,71 @@ export default function App() {
     maxWidth: isTablet ? "100%" : 980,
   };
 
+  const heroAmountStyle = {
+    ...styles.heroAmount,
+    fontSize: isPhone ? 46 : 72,
+    letterSpacing: isPhone ? -0.8 : -1.6,
+    whiteSpace: "nowrap",
+  };
+
   const subtitleStyle = {
     ...styles.subtitle,
     maxWidth: isTablet ? "100%" : 860,
     textAlign: "left",
   };
 
+  const totalTabs = MONTHS.length + 1;
+  const mobileMonthOptions = ["Dashboard", ...MONTHS];
+
   const tabsWrapStyle = {
     ...styles.tabsWrap,
-    flexWrap: isPhone ? "nowrap" : "wrap",
-    overflowX: isPhone ? "auto" : "visible",
-    paddingBottom: isPhone ? 4 : 0,
+    display: "grid",
+    gridTemplateColumns: `repeat(${totalTabs}, minmax(0, 1fr))`,
+    gap: 12,
+    width: "100%",
+    overflow: "visible",
+    paddingBottom: 0,
     marginBottom: 24,
-    scrollbarWidth: "none",
-    msOverflowStyle: "none",
+  };
+
+  const mobileMonthSelectWrapStyle = {
+    ...styles.yearBox,
+    width: "100%",
+    maxWidth: "100%",
+    minHeight: "auto",
+    padding: 12,
+    marginBottom: 24,
+  };
+
+  const mobileMonthSelectStyle = {
+    ...styles.input,
+    minHeight: 48,
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: "rgba(8, 15, 27, 0.88)",
+    border: "1px solid rgba(84, 116, 166, 0.30)",
+    color: "#e8eef9",
+    fontSize: 16,
+    fontWeight: 700,
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+  };
+
+  const tabButtonStyle = {
+    ...styles.tab,
+    width: "100%",
+    minWidth: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: isLaptop ? "12px 8px" : "12px 10px",
+    fontSize: isLaptop ? 13 : 14,
   };
 
   const dashboardGrid = {
     ...styles.dashboardGrid,
     gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.78fr) minmax(340px, 0.82fr)",
-    alignItems: "start",
+    alignItems: "stretch",
   };
   const monthGrid = {
     ...styles.monthGrid,
@@ -724,6 +754,57 @@ export default function App() {
     });
   }, [data]);
 
+  const categoryNetTotals = useMemo(() => {
+    const base = CATEGORIES.reduce((acc, category) => {
+      acc[category] = { category, ars: 0, usd: 0, count: 0 };
+      return acc;
+    }, {});
+
+    MONTHS.forEach((month) => {
+      const monthData = data[month] || emptyMonth();
+
+      monthData.ingresos.forEach((item) => {
+        const category = item.categoria || DEFAULT_CATEGORY;
+        if (!base[category]) {
+          base[category] = { category, ars: 0, usd: 0, count: 0 };
+        }
+
+        if (item.moneda === "USD") {
+          base[category].usd += Number(item.monto) || 0;
+        } else {
+          base[category].ars += Number(item.monto) || 0;
+        }
+
+        base[category].count += 1;
+      });
+
+      monthData.gastos.forEach((item) => {
+        const category = item.categoria || DEFAULT_CATEGORY;
+        if (!base[category]) {
+          base[category] = { category, ars: 0, usd: 0, count: 0 };
+        }
+
+        if (item.moneda === "USD") {
+          base[category].usd -= Number(item.monto) || 0;
+        } else {
+          base[category].ars -= Number(item.monto) || 0;
+        }
+
+        base[category].count += 1;
+      });
+    });
+
+    return Object.values(base).sort((a, b) => {
+      const absArsDiff = Math.abs(b.ars) - Math.abs(a.ars);
+      if (absArsDiff !== 0) return absArsDiff;
+
+      const absUsdDiff = Math.abs(b.usd) - Math.abs(a.usd);
+      if (absUsdDiff !== 0) return absUsdDiff;
+
+      return b.count - a.count;
+    });
+  }, [data]);
+
   const visibleCategoryRows = useMemo(() => {
     const rows = selectedCategoryFilter === "Todas"
       ? categoryExpenseTotals
@@ -731,6 +812,14 @@ export default function App() {
 
     return rows.filter((row) => row.ars > 0 || row.usd > 0 || row.count > 0);
   }, [categoryExpenseTotals, selectedCategoryFilter]);
+
+  const visibleCategoryNetRows = useMemo(() => {
+    const rows = selectedCategoryFilter === "Todas"
+      ? categoryNetTotals
+      : categoryNetTotals.filter((row) => row.category === selectedCategoryFilter);
+
+    return rows.filter((row) => row.ars !== 0 || row.usd !== 0 || row.count > 0);
+  }, [categoryNetTotals, selectedCategoryFilter]);
 
   const selectedCategorySummary = useMemo(() => {
     return visibleCategoryRows.reduce(
@@ -745,6 +834,7 @@ export default function App() {
   }, [visibleCategoryRows]);
 
   const topCategoryRows = useMemo(() => visibleCategoryRows.slice(0, 6), [visibleCategoryRows]);
+  const topCategoryNetRows = useMemo(() => visibleCategoryNetRows.slice(0, 6), [visibleCategoryNetRows]);
 
   const selectedCategoryLabel =
     selectedCategoryFilter === "Todas" ? "Todas las categorías" : selectedCategoryFilter;
@@ -808,7 +898,7 @@ export default function App() {
       <div style={styles.container}>
         <div style={headerStyle}>
           <div style={styles.titleBlock}>
-            <h1 style={titleStyle}>Control de Egresos e Ingresos</h1>
+            <h1 style={titleStyle}>Control de Gastos e Ingresos</h1>
             <p style={subtitleStyle}>
               Seguimiento anual con ahorro acumulado, balance mensual y evolución en dólares.
             </p>
@@ -829,7 +919,7 @@ export default function App() {
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                 >
-                  {Array.from({ length: 11 }, (_, i) => String(currentYear - 5 + i)).map((optionYear) => (
+                  {Array.from({ length: 11 }, (_, i) => String(2026 + i)).map((optionYear) => (
                     <option key={optionYear} value={optionYear}>
                       {optionYear}
                     </option>
@@ -837,58 +927,73 @@ export default function App() {
                 </select>
               </div>
 
-              <div style={topBarActionsStyle}>
-                <div style={styles.statusInline}>
-                  <div style={styles.statusInlineLabel}>Estado</div>
-                  <div style={styles.statusPill}>
-                    <span style={styles.statusDot} />
-                    {cloudStatus}
-                  </div>
+              <div style={statusInlineHeaderStyle}>
+                <div style={styles.statusInlineLabel}>Estado</div>
+                <div style={styles.statusPill}>
+                  <span style={styles.statusDot} />
+                  {cloudStatus}
                 </div>
-
-                <button style={styles.logoutButton} onClick={handleLogout}>
-                  Cerrar sesión
-                </button>
               </div>
+
+              <button style={logoutButtonHeaderStyle} onClick={handleLogout}>
+                Cerrar sesión
+              </button>
             </div>
           </div>
         </div>
 
         {cloudError ? <div style={styles.errorBanner}>{cloudError}</div> : null}
 
-        <div style={tabsWrapStyle}>
-          <button
-            onClick={() => setActiveTab("Dashboard")}
-            style={{
-              ...styles.tab,
-              ...(activeTab === "Dashboard" ? styles.activeTab : {}),
-            }}
-          >
-            Dashboard
-          </button>
-
-          {MONTHS.map((month) => (
+        {isPhone ? (
+          <div style={mobileMonthSelectWrapStyle}>
+            <label style={styles.label}>Vista</label>
+            <select
+              style={mobileMonthSelectStyle}
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+            >
+              {mobileMonthOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div style={tabsWrapStyle}>
             <button
-              key={month}
-              onClick={() => setActiveTab(month)}
+              onClick={() => setActiveTab("Dashboard")}
               style={{
-                ...styles.tab,
-                ...(activeTab === month ? styles.activeTab : {}),
+                ...tabButtonStyle,
+                ...(activeTab === "Dashboard" ? styles.activeTab : {}),
               }}
             >
-              {month}
+              Dashboard
             </button>
-          ))}
-        </div>
+
+            {MONTHS.map((month) => (
+              <button
+                key={month}
+                onClick={() => setActiveTab(month)}
+                style={{
+                  ...tabButtonStyle,
+                  ...(activeTab === month ? styles.activeTab : {}),
+                }}
+              >
+                {month}
+              </button>
+            ))}
+          </div>
+        )}
 
         {activeTab === "Dashboard" ? (
           <>
             <div style={dashboardGrid}>
-              <div style={{ ...styles.card, ...styles.heroCard }}>
+              <div style={{ ...styles.card, ...styles.heroCard, height: "100%", display: "flex", flexDirection: "column" }}>
                 <div style={styles.heroTopRow}>
                   <div>
                     <div style={styles.heroLabel}>Ahorro acumulado</div>
-                    <div style={styles.heroAmount}>$ {formatARS(finalARS)}</div>
+                    <div style={heroAmountStyle}>$ {formatARS(finalARS)}</div>
                   </div>
                   <div style={styles.heroBadge}>USD: US$ {formatUSD(finalUSD)}</div>
                 </div>
@@ -925,13 +1030,13 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={{ ...styles.card, ...styles.monthSnapshotCard }}>
+              <div style={{ ...styles.card, ...styles.monthSnapshotCard, height: "100%", display: "flex", flexDirection: "column" }}>
                 <div style={styles.cardTopRow}>
                   <h2 style={styles.cardTitle}>Foto de {currentMonth}</h2>
                   <span style={styles.snapshotChip}>Mes actual</span>
                 </div>
                 <SummaryRow label="Ingresos ARS" value={`$ ${formatARS(currentMonthSummary.ingresosARS)}`} />
-                <SummaryRow label="Egresos ARS" value={`$ ${formatARS(currentMonthSummary.gastosARS)}`} />
+                <SummaryRow label="Gastos ARS" value={`$ ${formatARS(currentMonthSummary.gastosARS)}`} />
                 <SummaryRow label="Balance ARS" value={`$ ${formatARS(currentMonthSummary.balanceARS)}`} strongTone={currentMonthSummary.balanceARS >= 0 ? "#6df0bd" : "#ff8c99"} />
                 <SummaryRow label="Movimientos" value={`${currentMonthSummary.movimientos}`} />
                 <div style={styles.divider} />
@@ -945,7 +1050,7 @@ export default function App() {
 
             <div style={statsGrid}>
               <StatCard title="Ingresos ARS" value={`$ ${formatARS(totals.ingresosARS)}`} accent="#4ef0a8" />
-              <StatCard title="Egresos ARS" value={`$ ${formatARS(totals.gastosARS)}`} accent="#ff7a8c" />
+              <StatCard title="Gastos ARS" value={`$ ${formatARS(totals.gastosARS)}`} accent="#ff7a8c" />
               <StatCard title="Balance anual ARS" value={`$ ${formatARS(totals.balanceARS)}`} accent="#88c8ff" />
               <StatCard title="Ahorro final USD" value={`US$ ${formatUSD(finalUSD)}`} accent="#f7d76d" />
             </div>
@@ -972,8 +1077,8 @@ export default function App() {
                 </select>
 
                 <div style={{ marginTop: 16 }}>
-                  <SummaryRow label="Egresos ARS filtrados" value={`$ ${formatARS(selectedCategorySummary.ars)}`} strongTone="#ff8c99" />
-                  <SummaryRow label="Egresos USD filtrados" value={`US$ ${formatUSD(selectedCategorySummary.usd)}`} strongTone="#89d5ff" />
+                  <SummaryRow label="Gastos ARS filtrados" value={`$ ${formatARS(selectedCategorySummary.ars)}`} strongTone="#ff8c99" />
+                  <SummaryRow label="Gastos USD filtrados" value={`US$ ${formatUSD(selectedCategorySummary.usd)}`} strongTone="#89d5ff" />
                   <SummaryRow label="Movimientos filtrados" value={`${selectedCategorySummary.count}`} />
                 </div>
               </div>
@@ -984,19 +1089,33 @@ export default function App() {
                   <span style={styles.snapshotChip}>{selectedCategoryLabel}</span>
                 </div>
 
-                {topCategoryRows.length === 0 ? (
-                  <div style={styles.emptyBox}>Todavía no hay egresos cargados para esa categoría.</div>
+                {topCategoryNetRows.length === 0 ? (
+                  <div style={styles.emptyBox}>Todavía no hay movimientos cargados para esa categoría.</div>
                 ) : (
                   <div style={styles.categoryList}>
-                    {topCategoryRows.map((row) => (
+                    {topCategoryNetRows.map((row) => (
                       <div key={row.category} style={styles.categoryRow}>
                         <div style={styles.categoryRowLeft}>
                           <span style={styles.categoryName}>{row.category}</span>
                           <span style={styles.categoryCount}>{row.count} mov.</span>
                         </div>
                         <div style={styles.categoryRowRight}>
-                          <span style={styles.categoryValueARS}>$ {formatARS(row.ars)}</span>
-                          <span style={styles.categoryValueUSD}>US$ {formatUSD(row.usd)}</span>
+                          <span
+                            style={{
+                              ...styles.categoryValueARS,
+                              color: row.ars > 0 ? "#8cf1c6" : row.ars < 0 ? "#ff9baa" : "#c8d6ef",
+                            }}
+                          >
+                            $ {formatARS(row.ars)}
+                          </span>
+                          <span
+                            style={{
+                              ...styles.categoryValueUSD,
+                              color: row.usd > 0 ? "#89d5ff" : row.usd < 0 ? "#ff9baa" : "#c8d6ef",
+                            }}
+                          >
+                            US$ {formatUSD(row.usd)}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -1032,11 +1151,11 @@ export default function App() {
             <div style={categoryAnalyticsGrid}>
               <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle}>Egresos por categoría</h2>
+                  <h2 style={styles.cardTitle}>Gastos por categoría</h2>
                   <span style={styles.chartLegendPillBlue}>ARS anual</span>
                 </div>
                 <p style={styles.chartDescription}>
-                  El gráfico toma los egresos acumulados en pesos por categoría del año seleccionado.
+                  El gráfico toma los gastos acumulados en pesos por categoría del año seleccionado.
                 </p>
                 <CategoryDonutChart data={topCategoryRows} />
               </div>
@@ -1081,11 +1200,11 @@ export default function App() {
                     <tr>
                       <th style={styles.th}>Mes</th>
                       <th style={styles.th}>Ingresos ARS</th>
-                      <th style={styles.th}>Egresos ARS</th>
+                      <th style={styles.th}>Gastos ARS</th>
                       <th style={styles.th}>Balance ARS</th>
                       <th style={styles.th}>Ahorro ARS</th>
                       <th style={styles.th}>Ingresos USD</th>
-                      <th style={styles.th}>Egresos USD</th>
+                      <th style={styles.th}>Gastos USD</th>
                       <th style={styles.th}>Ahorro USD</th>
                     </tr>
                   </thead>
@@ -1115,7 +1234,7 @@ export default function App() {
               <div style={monthMetaGrid}>
                 <InfoCard title="Movimientos" value={`${selectedSummary.movimientos}`} subtitle="Total cargado en el mes" compact />
                 <InfoCard title="Ingresos visibles" value={`${filteredIngresos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
-                <InfoCard title="Egresos visibles" value={`${filteredGastos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
+                <InfoCard title="Gastos visibles" value={`${filteredGastos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
               </div>
 
               <div style={{ height: 18 }} />
@@ -1131,7 +1250,7 @@ export default function App() {
               <div style={{ height: 18 }} />
 
               <EntrySection
-                title="Egresos"
+                title="Gastos"
                 entries={filteredGastos}
                 categoryFilter={selectedCategoryFilter}
                 onAdd={(entry) => addEntry(selectedMonthName, "gastos", entry)}
@@ -1156,12 +1275,12 @@ export default function App() {
                 </div>
                 <SummaryRow label="Ahorro inicial ARS" value={`$ ${formatARS(selectedSummary.ahorroBaseARS)}`} />
                 <SummaryRow label="Ingresos ARS" value={`$ ${formatARS(selectedSummary.ingresosARS)}`} />
-                <SummaryRow label="Egresos ARS" value={`$ ${formatARS(selectedSummary.gastosARS)}`} />
+                <SummaryRow label="Gastos ARS" value={`$ ${formatARS(selectedSummary.gastosARS)}`} />
                 <SummaryRow label="Ahorro final ARS" value={`$ ${formatARS(selectedSummary.ahorroFinalARS)}`} strongTone="#6df0bd" />
                 <div style={styles.divider} />
                 <SummaryRow label="Ahorro inicial USD" value={`US$ ${formatUSD(selectedSummary.ahorroBaseUSD)}`} />
                 <SummaryRow label="Ingresos USD" value={`US$ ${formatUSD(selectedSummary.ingresosUSD)}`} />
-                <SummaryRow label="Egresos USD" value={`US$ ${formatUSD(selectedSummary.gastosUSD)}`} />
+                <SummaryRow label="Gastos USD" value={`US$ ${formatUSD(selectedSummary.gastosUSD)}`} />
                 <SummaryRow label="Ahorro final USD" value={`US$ ${formatUSD(selectedSummary.ahorroFinalUSD)}`} strongTone="#89d5ff" />
               </div>
 
@@ -1255,7 +1374,7 @@ function AuthScreen({
         <div style={styles.authCard}>
           <div style={styles.authHeader}>
             <div style={styles.authEyebrow}>ACCESO SEGURO</div>
-            <h1 style={styles.authTitle}>Control de egresos personal</h1>
+            <h1 style={styles.authTitle}>Control de gastos personal</h1>
             <p style={styles.authSubtitle}>
               Registrate para guardar tu seguimiento y entrar siempre a tu propia información.
             </p>
@@ -1613,10 +1732,23 @@ function LineChart({ data }) {
         {data.map((item, index) => {
           const x = paddingX + (index * (width - paddingX * 2)) / Math.max(data.length - 1, 1);
           const y = height - paddingY - ((item.ahorroUSD - minValue) / range) * (height - paddingY * 2);
-
+          const valueY = Math.max(16, y - 12);
+        
           return (
             <g key={item.label}>
               <circle cx={x} cy={y} r="5" fill="#72c3ff" />
+        
+              <text
+                x={x}
+                y={valueY}
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="12"
+                fontWeight="700"
+              >
+                {item.ahorroUSD}
+              </text>
+        
               <text x={x} y={height - 6} textAnchor="middle" fill="#94a9cd" fontSize="11">
                 {item.label}
               </text>
@@ -1651,10 +1783,27 @@ function BarChart({ data }) {
           const x = paddingX + index * (barWidth + 10) + 5;
           const y = item.balanceARS >= 0 ? zeroY - scaled : zeroY;
           const fill = item.balanceARS >= 0 ? "#4ef0a8" : "#ff7a8c";
-
+          const valueY = item.balanceARS >= 0 ? y - 10 : y + scaled + 18;
+          const valueLabel =
+            item.balanceARS < 0
+              ? `-${formatARS(Math.abs(item.balanceARS))}`
+              : `${formatARS(item.balanceARS)}`;
+        
           return (
             <g key={item.label}>
               <rect x={x} y={y} width={barWidth} height={scaled} rx="8" fill={fill} opacity="0.92" />
+        
+              <text
+                x={x + barWidth / 2}
+                y={valueY}
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="12"
+                fontWeight="700"
+              >
+                {valueLabel}
+              </text>
+        
               <text x={x + barWidth / 2} y={height - 6} textAnchor="middle" fill="#94a9cd" fontSize="11">
                 {item.label}
               </text>
@@ -1679,7 +1828,7 @@ function CategoryDonutChart({ data }) {
   const total = data.reduce((acc, item) => acc + item.ars, 0);
 
   if (!total) {
-    return <div style={styles.emptyBox}>No hay egresos en pesos para graficar todavía.</div>;
+    return <div style={styles.emptyBox}>No hay gastos en pesos para graficar todavía.</div>;
   }
 
   let offset = 0;
@@ -1751,17 +1900,17 @@ const CATEGORY_COLORS = [
 const styles = {
 
   authPage: {
-    minHeight: "100vh",
+    minHeight: "100dvh",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
     padding: 24,
     boxSizing: "border-box",
     position: "relative",
-    overflow: "hidden",
+    overflowX: "hidden",
   },
   authShell: {
-    minHeight: "calc(100vh - 48px)",
+    minHeight: "calc(100dvh - 48px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1897,14 +2046,15 @@ const styles = {
     fontWeight: 700,
   },
   userCard: {
-    minHeight: 82,
-    padding: "16px 18px",
+    minHeight: 78,
+    padding: "15px 18px",
     borderRadius: 22,
     background: "linear-gradient(180deg, rgba(18, 32, 52, 0.88) 0%, rgba(11, 22, 38, 0.92) 100%)",
     border: "1px solid rgba(90, 120, 170, 0.20)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    alignItems: "flex-start",
     gap: 6,
     boxShadow: "0 18px 34px rgba(3, 9, 20, 0.14)",
   },
@@ -1928,9 +2078,9 @@ const styles = {
     marginTop: 2,
   },
   logoutButton: {
-    minHeight: 44,
-    borderRadius: 14,
-    padding: "0 18px",
+    minHeight: 40,
+    borderRadius: 16,
+    padding: "0 22px",
     background: "rgba(255, 122, 140, 0.08)",
     border: "1px solid rgba(255, 122, 140, 0.18)",
     color: "#ffb7c2",
@@ -1942,16 +2092,15 @@ const styles = {
   },
 
   page: {
-    minHeight: "100vh",
     width: "100%",
+    minHeight: "100dvh",
     background: "radial-gradient(circle at top left, #12213f 0%, #09111f 38%, #07101c 100%)",
     color: "#e8eef9",
     fontFamily: "Arial, sans-serif",
-    padding: "clamp(10px, 1vw, 18px)",
+    padding: "clamp(12px, 1.2vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
-    overflowX: "clip",
-    overflowY: "visible",
+    overflow: "clip",
   },
   glowTop: {
     position: "absolute",
@@ -1977,10 +2126,12 @@ const styles = {
   },
   container: {
     width: "100%",
-    maxWidth: "none",
+    maxWidth: "100%",
     margin: "0 auto",
     position: "relative",
     zIndex: 1,
+    overflow: "visible",
+    minWidth: 0,
   },
   header: {
     display: "grid",
@@ -1991,10 +2142,10 @@ const styles = {
   },
   headerRight: {
     display: "grid",
-    gap: 14,
-    justifyContent: "start",
+    gap: 16,
     width: "100%",
     minWidth: 0,
+    boxSizing: "border-box",
   },
   topBarActions: {
     display: "flex",
@@ -2027,21 +2178,22 @@ const styles = {
   },
   yearBox: {
     minWidth: 0,
-    minHeight: 82,
+    minHeight: 76,
     width: "100%",
-    background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
-    border: "1px solid rgba(72, 100, 145, 0.18)",
-    borderRadius: 22,
-    padding: 14,
-    boxShadow: "0 18px 34px rgba(4, 8, 18, 0.14)",
+    background: "linear-gradient(180deg, rgba(8, 15, 27, 0.88) 0%, rgba(6, 12, 22, 0.94) 100%)",
+    border: "1px solid rgba(84, 116, 166, 0.24)",
+    borderRadius: 18,
+    padding: 12,
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
     backdropFilter: "blur(10px)",
+    boxSizing: "border-box",
   },
   statusInline: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     gap: 8,
-    minWidth: 128,
+    minWidth: 0,
     flexShrink: 0,
   },
   statusInlineLabel: {
@@ -2056,8 +2208,8 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    minHeight: 42,
-    padding: "0 14px",
+    minHeight: 40,
+    padding: "0 16px",
     borderRadius: 999,
     background: "rgba(78, 240, 168, 0.08)",
     border: "1px solid rgba(78, 240, 168, 0.18)",
@@ -2065,6 +2217,7 @@ const styles = {
     fontWeight: 800,
     fontSize: 14,
     alignSelf: "flex-start",
+    whiteSpace: "nowrap",
   },
   statusDot: {
     width: 8,
@@ -2086,12 +2239,14 @@ const styles = {
     display: "grid",
     gap: 18,
     marginBottom: 18,
-    alignItems: "start",
+    alignItems: "stretch",
+    minWidth: 0,
   },
   chartsGrid: {
     display: "grid",
     gap: 18,
     marginBottom: 18,
+    minWidth: 0,
   },
   summaryCardsGrid: {
     display: "grid",
@@ -2119,6 +2274,7 @@ const styles = {
     marginBottom: 28,
     width: "100%",
     alignItems: "center",
+    minWidth: 0,
   },
   tab: {
     background: "rgba(13, 23, 39, 0.62)",
@@ -2145,6 +2301,7 @@ const styles = {
   monthGrid: {
     display: "grid",
     gap: 18,
+    minWidth: 0,
   },
   card: {
     background: "linear-gradient(180deg, rgba(12, 22, 38, 0.80) 0%, rgba(8, 17, 29, 0.84) 100%)",
@@ -2163,11 +2320,10 @@ const styles = {
     minHeight: 100,
   },
   heroTopRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 16,
-    flexWrap: "wrap",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) auto",
+    alignItems: "start",
+    gap: 18,
   },
   heroLabel: {
     color: "#9cb0d1",
@@ -2175,21 +2331,25 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 64,
     fontWeight: 800,
-    letterSpacing: -1.2,
+    lineHeight: 0.92,
   },
   heroBadge: {
-    padding: "10px 14px",
+    minWidth: 210,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "14px 18px",
     borderRadius: 999,
     color: "#f8de7d",
     background: "rgba(247, 215, 109, 0.10)",
     border: "1px solid rgba(247, 215, 109, 0.22)",
     fontWeight: 700,
+    fontSize: 18,
   },
   progressBlock: {
-    marginTop: 0,
-    padding: 12,
+    marginTop: 30,
+    padding: 16,
     borderRadius: 16,
     background: "rgba(9, 18, 30, 0.60)",
     border: "1px solid rgba(73, 102, 143, 0.32)",
@@ -2425,9 +2585,10 @@ const styles = {
   },
   quickEntryBox: {
     display: "grid",
-    gridTemplateColumns: "minmax(220px, 2fr) minmax(140px, 1fr) 110px minmax(180px, 1.2fr)",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
     gap: 10,
     marginBottom: 10,
+    minWidth: 0,
   },
   quickInputText: {
     minWidth: 0,
@@ -2604,6 +2765,8 @@ const styles = {
   },
   tableWrap: {
     overflowX: "auto",
+    width: "100%",
+    maxWidth: "100%",
   },
   table: {
     width: "100%",
