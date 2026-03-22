@@ -433,6 +433,13 @@ export default function App() {
     maxWidth: isTablet ? "100%" : 980,
   };
 
+  const heroAmountStyle = {
+    ...styles.heroAmount,
+    fontSize: isPhone ? 46 : 72,
+    letterSpacing: isPhone ? -0.8 : -1.6,
+    whiteSpace: "nowrap",
+  };
+
   const subtitleStyle = {
     ...styles.subtitle,
     maxWidth: isTablet ? "100%" : 860,
@@ -986,7 +993,7 @@ export default function App() {
                 <div style={styles.heroTopRow}>
                   <div>
                     <div style={styles.heroLabel}>Ahorro acumulado</div>
-                    <div style={styles.heroAmount}>$ {formatARS(finalARS)}</div>
+                    <div style={heroAmountStyle}>$ {formatARS(finalARS)}</div>
                   </div>
                   <div style={styles.heroBadge}>USD: US$ {formatUSD(finalUSD)}</div>
                 </div>
@@ -2324,9 +2331,7 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 72,
     fontWeight: 800,
-    letterSpacing: -1.6,
     lineHeight: 0.92,
   },
   heroBadge: {
