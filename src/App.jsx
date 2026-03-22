@@ -2324,9 +2324,9 @@ const styles = {
     marginBottom: 8,
   },
   heroAmount: {
-    fontSize: 72,
+    fontSize: isPhone ? 52 : 72,
     fontWeight: 800,
-    letterSpacing: -1.6,
+    letterSpacing: isPhone ? -1 : -1.6,
     lineHeight: 0.92,
   },
   heroBadge: {
