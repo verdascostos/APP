@@ -435,15 +435,41 @@ export default function App() {
     textAlign: "left",
   };
 
-  const tabsWrapStyle = {
-    ...styles.tabsWrap,
-    flexWrap: isPhone ? "nowrap" : "wrap",
-    overflowX: isPhone ? "auto" : "visible",
-    paddingBottom: isPhone ? 4 : 0,
-    marginBottom: 24,
-    rowGap: 10,
-    scrollbarWidth: "none",
-    msOverflowStyle: "none",
+  const totalTabs = MONTHS.length + 1;
+
+  const tabsWrapStyle = isPhone
+    ? {
+        ...styles.tabsWrap,
+        display: "flex",
+        flexWrap: "nowrap",
+        overflowX: "auto",
+        paddingBottom: 4,
+        marginBottom: 24,
+        rowGap: 10,
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+      }
+    : {
+        ...styles.tabsWrap,
+        display: "grid",
+        gridTemplateColumns: `repeat(${totalTabs}, minmax(0, 1fr))`,
+        gap: 12,
+        width: "100%",
+        overflow: "visible",
+        paddingBottom: 0,
+        marginBottom: 24,
+      };
+
+  const tabButtonStyle = {
+    ...styles.tab,
+    width: "100%",
+    minWidth: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: isLaptop ? "12px 8px" : "12px 10px",
+    fontSize: isLaptop ? 13 : 14,
   };
 
   const dashboardGrid = {
@@ -840,7 +866,7 @@ export default function App() {
           <button
             onClick={() => setActiveTab("Dashboard")}
             style={{
-              ...styles.tab,
+              ...tabButtonStyle,
               ...(activeTab === "Dashboard" ? styles.activeTab : {}),
             }}
           >
@@ -852,7 +878,7 @@ export default function App() {
               key={month}
               onClick={() => setActiveTab(month)}
               style={{
-                ...styles.tab,
+                ...tabButtonStyle,
                 ...(activeTab === month ? styles.activeTab : {}),
               }}
             >
