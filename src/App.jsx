@@ -351,52 +351,68 @@ export default function App() {
   const headerRightStyle = {
     ...styles.headerRight,
     display: "grid",
-    gridTemplateColumns: isTablet ? "1fr" : "minmax(280px, 420px) minmax(0, 1fr)",
+    gridTemplateColumns: isTablet ? "1fr" : "minmax(320px, 1fr) auto",
     alignItems: "center",
     width: "100%",
-    gap: isPhone ? 14 : 18,
+    gap: isPhone ? 16 : 22,
     minWidth: 0,
+    padding: isPhone ? 16 : "18px 20px",
+    borderRadius: 28,
+    background: "linear-gradient(180deg, rgba(16, 28, 48, 0.78) 0%, rgba(10, 19, 33, 0.82) 100%)",
+    border: "1px solid rgba(76, 104, 146, 0.24)",
+    boxShadow: "0 20px 44px rgba(0,0,0,0.14)",
+    backdropFilter: "blur(12px)",
   };
 
   const userCardStyle = {
     ...styles.userCard,
     width: "100%",
-    maxWidth: isTablet ? "100%" : 420,
-    justifySelf: "start",
+    maxWidth: "none",
+    minHeight: "auto",
+    padding: isPhone ? 0 : "0 10px 0 8px",
+    borderRadius: 0,
+    background: "transparent",
+    border: "none",
+    boxShadow: "none",
+    justifySelf: "stretch",
   };
 
   const headerControlsGroupStyle = {
-    display: "flex",
-    flexWrap: isPhone ? "wrap" : "nowrap",
-    alignItems: isTinyPhone ? "stretch" : "flex-end",
-    justifyContent: isTablet ? "flex-start" : "flex-end",
-    gap: isTinyPhone ? 12 : 16,
-    width: "100%",
+    display: "grid",
+    gridTemplateColumns: isTinyPhone
+      ? "1fr"
+      : isPhone
+      ? "minmax(180px, 1fr) auto"
+      : "216px auto auto",
+    alignItems: "end",
+    justifyContent: isTablet ? "stretch" : "end",
+    columnGap: isTinyPhone ? 12 : 16,
+    rowGap: 12,
+    width: isTablet ? "100%" : "auto",
     minWidth: 0,
   };
 
   const yearBoxStyle = {
     ...styles.yearBox,
-    width: isTinyPhone ? "100%" : 216,
+    width: "100%",
     maxWidth: "100%",
-    minWidth: isTinyPhone ? 0 : 198,
-    minHeight: isPhone ? 76 : 78,
-    padding: isPhone ? 12 : "12px 14px",
-    flex: isTinyPhone ? "1 1 100%" : "0 0 216px",
+    minWidth: 0,
+    minHeight: isPhone ? 72 : 76,
+    padding: isPhone ? 12 : "11px 14px",
   };
 
   const statusInlineHeaderStyle = {
     ...styles.statusInline,
     minWidth: 0,
-    flex: "0 0 auto",
     alignItems: "flex-start",
-    alignSelf: isTinyPhone ? "stretch" : "flex-end",
+    justifySelf: "start",
+    alignSelf: "end",
   };
 
   const logoutButtonHeaderStyle = {
     ...styles.logoutButton,
-    flex: "0 0 auto",
-    alignSelf: isTinyPhone ? "stretch" : "flex-end",
+    alignSelf: "end",
+    justifySelf: isTinyPhone ? "stretch" : "start",
     width: isTinyPhone ? "100%" : "auto",
   };
 
@@ -1869,6 +1885,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    alignItems: "flex-start",
     gap: 6,
     boxShadow: "0 18px 34px rgba(3, 9, 20, 0.14)",
   },
@@ -1892,9 +1909,9 @@ const styles = {
     marginTop: 2,
   },
   logoutButton: {
-    minHeight: 44,
-    borderRadius: 14,
-    padding: "0 18px",
+    minHeight: 40,
+    borderRadius: 16,
+    padding: "0 22px",
     background: "rgba(255, 122, 140, 0.08)",
     border: "1px solid rgba(255, 122, 140, 0.18)",
     color: "#ffb7c2",
@@ -1959,6 +1976,7 @@ const styles = {
     gap: 16,
     width: "100%",
     minWidth: 0,
+    boxSizing: "border-box",
   },
   topBarActions: {
     display: "flex",
@@ -1991,14 +2009,15 @@ const styles = {
   },
   yearBox: {
     minWidth: 0,
-    minHeight: 78,
+    minHeight: 76,
     width: "100%",
-    background: "linear-gradient(180deg, rgba(10, 19, 33, 0.90) 0%, rgba(8, 15, 27, 0.94) 100%)",
-    border: "1px solid rgba(72, 100, 145, 0.18)",
-    borderRadius: 22,
+    background: "linear-gradient(180deg, rgba(8, 15, 27, 0.88) 0%, rgba(6, 12, 22, 0.94) 100%)",
+    border: "1px solid rgba(84, 116, 166, 0.24)",
+    borderRadius: 18,
     padding: 12,
-    boxShadow: "0 16px 28px rgba(4, 8, 18, 0.12)",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
     backdropFilter: "blur(10px)",
+    boxSizing: "border-box",
   },
   statusInline: {
     display: "flex",
@@ -2020,8 +2039,8 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    minHeight: 42,
-    padding: "0 14px",
+    minHeight: 40,
+    padding: "0 16px",
     borderRadius: 999,
     background: "rgba(78, 240, 168, 0.08)",
     border: "1px solid rgba(78, 240, 168, 0.18)",
@@ -2029,6 +2048,7 @@ const styles = {
     fontWeight: 800,
     fontSize: 14,
     alignSelf: "flex-start",
+    whiteSpace: "nowrap",
   },
   statusDot: {
     width: 8,
