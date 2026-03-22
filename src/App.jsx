@@ -1957,7 +1957,7 @@ const styles = {
     padding: "clamp(12px, 1.2vw, 18px)",
     boxSizing: "border-box",
     position: "relative",
-    overflowX: "hidden",
+    overflow: "clip",
   },
   glowTop: {
     position: "absolute",
