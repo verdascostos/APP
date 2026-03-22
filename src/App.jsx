@@ -441,28 +441,21 @@ export default function App() {
 
   const totalTabs = MONTHS.length + 1;
 
-  const tabsWrapStyle = isPhone
-    ? {
-        ...styles.tabsWrap,
-        display: "flex",
-        flexWrap: "nowrap",
-        overflowX: "auto",
-        paddingBottom: 4,
-        marginBottom: 24,
-        rowGap: 10,
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
-      }
-    : {
-        ...styles.tabsWrap,
-        display: "grid",
-        gridTemplateColumns: `repeat(${totalTabs}, minmax(0, 1fr))`,
-        gap: 12,
-        width: "100%",
-        overflow: "visible",
-        paddingBottom: 0,
-        marginBottom: 24,
-      };
+  const tabsWrapStyle = {
+    ...styles.tabsWrap,
+    display: "grid",
+    gridTemplateColumns: `repeat(${totalTabs}, minmax(0, 1fr))`,
+    gap: 12,
+    width: "100%",
+    overflow: "visible",
+    paddingBottom: 0,
+    marginBottom: 24,
+  };
+
+  const mobileMonthSelectWrapStyle = {
+    ...styles.mobileMonthSelectWrap,
+    marginBottom: 24,
+  };
 
   const tabButtonStyle = {
     ...styles.tab,
@@ -926,30 +919,48 @@ export default function App() {
 
         {cloudError ? <div style={styles.errorBanner}>{cloudError}</div> : null}
 
-        <div style={tabsWrapStyle}>
-          <button
-            onClick={() => setActiveTab("Dashboard")}
-            style={{
-              ...tabButtonStyle,
-              ...(activeTab === "Dashboard" ? styles.activeTab : {}),
-            }}
-          >
-            Dashboard
-          </button>
-
-          {MONTHS.map((month) => (
+        {isPhone ? (
+          <div style={mobileMonthSelectWrapStyle}>
+            <label style={styles.label}>Vista</label>
+            <select
+              style={styles.input}
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+            >
+              <option value="Dashboard">Dashboard</option>
+              {MONTHS.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div style={tabsWrapStyle}>
             <button
-              key={month}
-              onClick={() => setActiveTab(month)}
+              onClick={() => setActiveTab("Dashboard")}
               style={{
                 ...tabButtonStyle,
-                ...(activeTab === month ? styles.activeTab : {}),
+                ...(activeTab === "Dashboard" ? styles.activeTab : {}),
               }}
             >
-              {month}
+              Dashboard
             </button>
-          ))}
-        </div>
+
+            {MONTHS.map((month) => (
+              <button
+                key={month}
+                onClick={() => setActiveTab(month)}
+                style={{
+                  ...tabButtonStyle,
+                  ...(activeTab === month ? styles.activeTab : {}),
+                }}
+              >
+                {month}
+              </button>
+            ))}
+          </div>
+        )}
 
         {activeTab === "Dashboard" ? (
           <>
@@ -2240,6 +2251,10 @@ const styles = {
     width: "100%",
     alignItems: "center",
     minWidth: 0,
+  },
+  mobileMonthSelectWrap: {
+    width: "100%",
+    maxWidth: "100%",
   },
   tab: {
     background: "rgba(13, 23, 39, 0.62)",
