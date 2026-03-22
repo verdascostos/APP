@@ -48,7 +48,7 @@ const DEFAULT_CATEGORY = "Otros";
 
 const emptyMonth = () => ({
   ingresos: [],
-  gastos: [],
+  Egresos: [],
   ahorroInicialARS: 0,
   ahorroInicialUSD: 0,
 });
@@ -72,8 +72,8 @@ const hydrateYearData = (months = {}) => {
       ingresos: Array.isArray(incoming.ingresos)
         ? incoming.ingresos.map((item) => ({ ...item, categoria: item.categoria || DEFAULT_CATEGORY }))
         : [],
-      gastos: Array.isArray(incoming.gastos)
-        ? incoming.gastos.map((item) => ({ ...item, categoria: item.categoria || DEFAULT_CATEGORY }))
+      Egresos: Array.isArray(incoming.Egresos)
+        ? incoming.Egresos.map((item) => ({ ...item, categoria: item.categoria || DEFAULT_CATEGORY }))
         : [],
     };
   });
@@ -595,11 +595,11 @@ export default function App() {
         .filter((item) => item.moneda === "USD")
         .reduce((acc, item) => acc + (Number(item.monto) || 0), 0);
 
-      const gastosARS = monthData.gastos
+      const EgresosARS = monthData.Egresos
         .filter((item) => item.moneda === "ARS")
         .reduce((acc, item) => acc + (Number(item.monto) || 0), 0);
 
-      const gastosUSD = monthData.gastos
+      const EgresosUSD = monthData.Egresos
         .filter((item) => item.moneda === "USD")
         .reduce((acc, item) => acc + (Number(item.monto) || 0), 0);
 
@@ -608,8 +608,8 @@ export default function App() {
       const ahorroBaseUSD =
         index === 0 ? Number(monthData.ahorroInicialUSD) || 0 : runningUSD;
 
-      const balanceARS = ingresosARS - gastosARS;
-      const balanceUSD = ingresosUSD - gastosUSD;
+      const balanceARS = ingresosARS - EgresosARS;
+      const balanceUSD = ingresosUSD - EgresosUSD;
       const ahorroFinalARS = ahorroBaseARS + balanceARS;
       const ahorroFinalUSD = ahorroBaseUSD + balanceUSD;
 
@@ -619,17 +619,17 @@ export default function App() {
       summary[month] = {
         ingresosARS,
         ingresosUSD,
-        gastosARS,
-        gastosUSD,
+        EgresosARS,
+        EgresosUSD,
         ahorroBaseARS,
         ahorroBaseUSD,
         balanceARS,
         balanceUSD,
         ahorroFinalARS,
         ahorroFinalUSD,
-        movimientos: monthData.ingresos.length + monthData.gastos.length,
+        movimientos: monthData.ingresos.length + monthData.Egresos.length,
         cantidadIngresos: monthData.ingresos.length,
-        cantidadGastos: monthData.gastos.length,
+        cantidadEgresos: monthData.Egresos.length,
       };
     });
 
@@ -641,8 +641,8 @@ export default function App() {
       (acc, month) => {
         acc.ingresosARS += monthSummary[month]?.ingresosARS || 0;
         acc.ingresosUSD += monthSummary[month]?.ingresosUSD || 0;
-        acc.gastosARS += monthSummary[month]?.gastosARS || 0;
-        acc.gastosUSD += monthSummary[month]?.gastosUSD || 0;
+        acc.EgresosARS += monthSummary[month]?.EgresosARS || 0;
+        acc.EgresosUSD += monthSummary[month]?.EgresosUSD || 0;
         acc.balanceARS += monthSummary[month]?.balanceARS || 0;
         acc.balanceUSD += monthSummary[month]?.balanceUSD || 0;
         acc.movimientos += monthSummary[month]?.movimientos || 0;
@@ -651,8 +651,8 @@ export default function App() {
       {
         ingresosARS: 0,
         ingresosUSD: 0,
-        gastosARS: 0,
-        gastosUSD: 0,
+        EgresosARS: 0,
+        EgresosUSD: 0,
         balanceARS: 0,
         balanceUSD: 0,
         movimientos: 0,
@@ -663,8 +663,8 @@ export default function App() {
   const currentMonthSummary = monthSummary[currentMonth] || {
     ingresosARS: 0,
     ingresosUSD: 0,
-    gastosARS: 0,
-    gastosUSD: 0,
+    EgresosARS: 0,
+    EgresosUSD: 0,
     ahorroBaseARS: 0,
     ahorroBaseUSD: 0,
     balanceARS: 0,
@@ -673,7 +673,7 @@ export default function App() {
     ahorroFinalUSD: 0,
     movimientos: 0,
     cantidadIngresos: 0,
-    cantidadGastos: 0,
+    cantidadEgresos: 0,
   };
 
   const finalMonth = MONTHS[MONTHS.length - 1];
@@ -731,7 +731,7 @@ export default function App() {
 
     MONTHS.forEach((month) => {
       const monthData = data[month] || emptyMonth();
-      monthData.gastos.forEach((item) => {
+      monthData.Egresos.forEach((item) => {
         const category = item.categoria || DEFAULT_CATEGORY;
         if (!base[category]) {
           base[category] = { category, ars: 0, usd: 0, count: 0 };
@@ -778,7 +778,7 @@ export default function App() {
         base[category].count += 1;
       });
 
-      monthData.gastos.forEach((item) => {
+      monthData.Egresos.forEach((item) => {
         const category = item.categoria || DEFAULT_CATEGORY;
         if (!base[category]) {
           base[category] = { category, ars: 0, usd: 0, count: 0 };
@@ -844,8 +844,8 @@ export default function App() {
   const selectedSummary = monthSummary[selectedMonthName] || {
     ingresosARS: 0,
     ingresosUSD: 0,
-    gastosARS: 0,
-    gastosUSD: 0,
+    EgresosARS: 0,
+    EgresosUSD: 0,
     ahorroBaseARS: 0,
     ahorroBaseUSD: 0,
     balanceARS: 0,
@@ -854,7 +854,7 @@ export default function App() {
     ahorroFinalUSD: 0,
     movimientos: 0,
     cantidadIngresos: 0,
-    cantidadGastos: 0,
+    cantidadEgresos: 0,
   };
 
   const filteredIngresos = useMemo(() => {
@@ -862,10 +862,10 @@ export default function App() {
     return selectedMonth.ingresos.filter((entry) => (entry.categoria || DEFAULT_CATEGORY) === selectedCategoryFilter);
   }, [selectedMonth.ingresos, selectedCategoryFilter]);
 
-  const filteredGastos = useMemo(() => {
-    if (selectedCategoryFilter === "Todas") return selectedMonth.gastos;
-    return selectedMonth.gastos.filter((entry) => (entry.categoria || DEFAULT_CATEGORY) === selectedCategoryFilter);
-  }, [selectedMonth.gastos, selectedCategoryFilter]);
+  const filteredEgresos = useMemo(() => {
+    if (selectedCategoryFilter === "Todas") return selectedMonth.Egresos;
+    return selectedMonth.Egresos.filter((entry) => (entry.categoria || DEFAULT_CATEGORY) === selectedCategoryFilter);
+  }, [selectedMonth.Egresos, selectedCategoryFilter]);
 
 
   if (!authReady) {
@@ -898,7 +898,7 @@ export default function App() {
       <div style={styles.container}>
         <div style={headerStyle}>
           <div style={styles.titleBlock}>
-            <h1 style={titleStyle}>Control de Gastos e Ingresos</h1>
+            <h1 style={titleStyle}>Control de Egresos e Ingresos</h1>
             <p style={subtitleStyle}>
               Seguimiento anual con ahorro acumulado, balance mensual y evolución en dólares.
             </p>
@@ -1036,7 +1036,7 @@ export default function App() {
                   <span style={styles.snapshotChip}>Mes actual</span>
                 </div>
                 <SummaryRow label="Ingresos ARS" value={`$ ${formatARS(currentMonthSummary.ingresosARS)}`} />
-                <SummaryRow label="Gastos ARS" value={`$ ${formatARS(currentMonthSummary.gastosARS)}`} />
+                <SummaryRow label="Egresos ARS" value={`$ ${formatARS(currentMonthSummary.EgresosARS)}`} />
                 <SummaryRow label="Balance ARS" value={`$ ${formatARS(currentMonthSummary.balanceARS)}`} strongTone={currentMonthSummary.balanceARS >= 0 ? "#6df0bd" : "#ff8c99"} />
                 <SummaryRow label="Movimientos" value={`${currentMonthSummary.movimientos}`} />
                 <div style={styles.divider} />
@@ -1050,7 +1050,7 @@ export default function App() {
 
             <div style={statsGrid}>
               <StatCard title="Ingresos ARS" value={`$ ${formatARS(totals.ingresosARS)}`} accent="#4ef0a8" />
-              <StatCard title="Gastos ARS" value={`$ ${formatARS(totals.gastosARS)}`} accent="#ff7a8c" />
+              <StatCard title="Egresos ARS" value={`$ ${formatARS(totals.EgresosARS)}`} accent="#ff7a8c" />
               <StatCard title="Balance anual ARS" value={`$ ${formatARS(totals.balanceARS)}`} accent="#88c8ff" />
               <StatCard title="Ahorro final USD" value={`US$ ${formatUSD(finalUSD)}`} accent="#f7d76d" />
             </div>
@@ -1077,8 +1077,8 @@ export default function App() {
                 </select>
 
                 <div style={{ marginTop: 16 }}>
-                  <SummaryRow label="Gastos ARS filtrados" value={`$ ${formatARS(selectedCategorySummary.ars)}`} strongTone="#ff8c99" />
-                  <SummaryRow label="Gastos USD filtrados" value={`US$ ${formatUSD(selectedCategorySummary.usd)}`} strongTone="#89d5ff" />
+                  <SummaryRow label="Egresos ARS filtrados" value={`$ ${formatARS(selectedCategorySummary.ars)}`} strongTone="#ff8c99" />
+                  <SummaryRow label="Egresos USD filtrados" value={`US$ ${formatUSD(selectedCategorySummary.usd)}`} strongTone="#89d5ff" />
                   <SummaryRow label="Movimientos filtrados" value={`${selectedCategorySummary.count}`} />
                 </div>
               </div>
@@ -1151,11 +1151,11 @@ export default function App() {
             <div style={categoryAnalyticsGrid}>
               <div style={styles.card}>
                 <div style={styles.cardTopRow}>
-                  <h2 style={styles.cardTitle}>Gastos por categoría</h2>
+                  <h2 style={styles.cardTitle}>Egresos por categoría</h2>
                   <span style={styles.chartLegendPillBlue}>ARS anual</span>
                 </div>
                 <p style={styles.chartDescription}>
-                  El gráfico toma los gastos acumulados en pesos por categoría del año seleccionado.
+                  El gráfico toma los Egresos acumulados en pesos por categoría del año seleccionado.
                 </p>
                 <CategoryDonutChart data={topCategoryRows} />
               </div>
@@ -1200,11 +1200,11 @@ export default function App() {
                     <tr>
                       <th style={styles.th}>Mes</th>
                       <th style={styles.th}>Ingresos ARS</th>
-                      <th style={styles.th}>Gastos ARS</th>
+                      <th style={styles.th}>Egresos ARS</th>
                       <th style={styles.th}>Balance ARS</th>
                       <th style={styles.th}>Ahorro ARS</th>
                       <th style={styles.th}>Ingresos USD</th>
-                      <th style={styles.th}>Gastos USD</th>
+                      <th style={styles.th}>Egresos USD</th>
                       <th style={styles.th}>Ahorro USD</th>
                     </tr>
                   </thead>
@@ -1213,13 +1213,13 @@ export default function App() {
                       <tr key={month}>
                         <td style={styles.td}>{month}</td>
                         <td style={styles.td}>$ {formatARS(monthSummary[month]?.ingresosARS || 0)}</td>
-                        <td style={styles.td}>$ {formatARS(monthSummary[month]?.gastosARS || 0)}</td>
+                        <td style={styles.td}>$ {formatARS(monthSummary[month]?.EgresosARS || 0)}</td>
                         <td style={{ ...styles.td, color: (monthSummary[month]?.balanceARS || 0) >= 0 ? "#6df0bd" : "#ff8c99" }}>
                           $ {formatARS(monthSummary[month]?.balanceARS || 0)}
                         </td>
                         <td style={styles.td}>$ {formatARS(monthSummary[month]?.ahorroFinalARS || 0)}</td>
                         <td style={styles.td}>US$ {formatUSD(monthSummary[month]?.ingresosUSD || 0)}</td>
-                        <td style={styles.td}>US$ {formatUSD(monthSummary[month]?.gastosUSD || 0)}</td>
+                        <td style={styles.td}>US$ {formatUSD(monthSummary[month]?.EgresosUSD || 0)}</td>
                         <td style={styles.td}>US$ {formatUSD(monthSummary[month]?.ahorroFinalUSD || 0)}</td>
                       </tr>
                     ))}
@@ -1234,7 +1234,7 @@ export default function App() {
               <div style={monthMetaGrid}>
                 <InfoCard title="Movimientos" value={`${selectedSummary.movimientos}`} subtitle="Total cargado en el mes" compact />
                 <InfoCard title="Ingresos visibles" value={`${filteredIngresos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
-                <InfoCard title="Gastos visibles" value={`${filteredGastos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
+                <InfoCard title="Egresos visibles" value={`${filteredEgresos.length}`} subtitle={`Filtro: ${selectedCategoryLabel}`} compact />
               </div>
 
               <div style={{ height: 18 }} />
@@ -1250,11 +1250,11 @@ export default function App() {
               <div style={{ height: 18 }} />
 
               <EntrySection
-                title="Gastos"
-                entries={filteredGastos}
+                title="Egresos"
+                entries={filteredEgresos}
                 categoryFilter={selectedCategoryFilter}
-                onAdd={(entry) => addEntry(selectedMonthName, "gastos", entry)}
-                onDelete={(id) => deleteEntry(selectedMonthName, "gastos", id)}
+                onAdd={(entry) => addEntry(selectedMonthName, "Egresos", entry)}
+                onDelete={(id) => deleteEntry(selectedMonthName, "Egresos", id)}
               />
             </div>
 
@@ -1275,12 +1275,12 @@ export default function App() {
                 </div>
                 <SummaryRow label="Ahorro inicial ARS" value={`$ ${formatARS(selectedSummary.ahorroBaseARS)}`} />
                 <SummaryRow label="Ingresos ARS" value={`$ ${formatARS(selectedSummary.ingresosARS)}`} />
-                <SummaryRow label="Gastos ARS" value={`$ ${formatARS(selectedSummary.gastosARS)}`} />
+                <SummaryRow label="Egresos ARS" value={`$ ${formatARS(selectedSummary.EgresosARS)}`} />
                 <SummaryRow label="Ahorro final ARS" value={`$ ${formatARS(selectedSummary.ahorroFinalARS)}`} strongTone="#6df0bd" />
                 <div style={styles.divider} />
                 <SummaryRow label="Ahorro inicial USD" value={`US$ ${formatUSD(selectedSummary.ahorroBaseUSD)}`} />
                 <SummaryRow label="Ingresos USD" value={`US$ ${formatUSD(selectedSummary.ingresosUSD)}`} />
-                <SummaryRow label="Gastos USD" value={`US$ ${formatUSD(selectedSummary.gastosUSD)}`} />
+                <SummaryRow label="Egresos USD" value={`US$ ${formatUSD(selectedSummary.EgresosUSD)}`} />
                 <SummaryRow label="Ahorro final USD" value={`US$ ${formatUSD(selectedSummary.ahorroFinalUSD)}`} strongTone="#89d5ff" />
               </div>
 
@@ -1374,7 +1374,7 @@ function AuthScreen({
         <div style={styles.authCard}>
           <div style={styles.authHeader}>
             <div style={styles.authEyebrow}>ACCESO SEGURO</div>
-            <h1 style={styles.authTitle}>Control de gastos personal</h1>
+            <h1 style={styles.authTitle}>Control de Egresos personal</h1>
             <p style={styles.authSubtitle}>
               Registrate para guardar tu seguimiento y entrar siempre a tu propia información.
             </p>
@@ -1828,7 +1828,7 @@ function CategoryDonutChart({ data }) {
   const total = data.reduce((acc, item) => acc + item.ars, 0);
 
   if (!total) {
-    return <div style={styles.emptyBox}>No hay gastos en pesos para graficar todavía.</div>;
+    return <div style={styles.emptyBox}>No hay Egresos en pesos para graficar todavía.</div>;
   }
 
   let offset = 0;
