@@ -475,7 +475,7 @@ export default function App() {
   const dashboardGrid = {
     ...styles.dashboardGrid,
     gridTemplateColumns: isTablet ? "1fr" : "minmax(0, 1.78fr) minmax(340px, 0.82fr)",
-    alignItems: "start",
+    alignItems: "stretch",
   };
   const monthGrid = {
     ...styles.monthGrid,
@@ -890,7 +890,7 @@ export default function App() {
         {activeTab === "Dashboard" ? (
           <>
             <div style={dashboardGrid}>
-              <div style={{ ...styles.card, ...styles.heroCard }}>
+              <div style={{ ...styles.card, ...styles.heroCard, height: "100%", display: "flex", flexDirection: "column" }}>
                 <div style={styles.heroTopRow}>
                   <div>
                     <div style={styles.heroLabel}>Ahorro acumulado</div>
@@ -931,7 +931,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={{ ...styles.card, ...styles.monthSnapshotCard }}>
+              <div style={{ ...styles.card, ...styles.monthSnapshotCard, height: "100%", display: "flex", flexDirection: "column" }}>
                 <div style={styles.cardTopRow}>
                   <h2 style={styles.cardTitle}>Foto de {currentMonth}</h2>
                   <span style={styles.snapshotChip}>Mes actual</span>
@@ -2096,7 +2096,7 @@ const styles = {
     display: "grid",
     gap: 18,
     marginBottom: 18,
-    alignItems: "start",
+    alignItems: "stretch",
     minWidth: 0,
   },
   chartsGrid: {
