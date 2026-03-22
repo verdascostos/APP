@@ -1623,10 +1623,23 @@ function LineChart({ data }) {
         {data.map((item, index) => {
           const x = paddingX + (index * (width - paddingX * 2)) / Math.max(data.length - 1, 1);
           const y = height - paddingY - ((item.ahorroUSD - minValue) / range) * (height - paddingY * 2);
-
+          const valueY = Math.max(16, y - 12);
+        
           return (
             <g key={item.label}>
               <circle cx={x} cy={y} r="5" fill="#72c3ff" />
+        
+              <text
+                x={x}
+                y={valueY}
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="12"
+                fontWeight="700"
+              >
+                {item.ahorroUSD}
+              </text>
+        
               <text x={x} y={height - 6} textAnchor="middle" fill="#94a9cd" fontSize="11">
                 {item.label}
               </text>
@@ -1661,10 +1674,27 @@ function BarChart({ data }) {
           const x = paddingX + index * (barWidth + 10) + 5;
           const y = item.balanceARS >= 0 ? zeroY - scaled : zeroY;
           const fill = item.balanceARS >= 0 ? "#4ef0a8" : "#ff7a8c";
-
+          const valueY = item.balanceARS >= 0 ? y - 10 : y + scaled + 18;
+          const valueLabel =
+            item.balanceARS < 0
+              ? `-${formatARS(Math.abs(item.balanceARS))}`
+              : `${formatARS(item.balanceARS)}`;
+        
           return (
             <g key={item.label}>
               <rect x={x} y={y} width={barWidth} height={scaled} rx="8" fill={fill} opacity="0.92" />
+        
+              <text
+                x={x + barWidth / 2}
+                y={valueY}
+                textAnchor="middle"
+                fill="#ffffff"
+                fontSize="12"
+                fontWeight="700"
+              >
+                {valueLabel}
+              </text>
+        
               <text x={x + barWidth / 2} y={height - 6} textAnchor="middle" fill="#94a9cd" fontSize="11">
                 {item.label}
               </text>
